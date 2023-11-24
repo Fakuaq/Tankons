@@ -1,16 +1,40 @@
-# This is a sample Python script.
+import random
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from player import *
+from god import *
 
+class Game:
+    def __init__(self):
+        pg.init()
+        self.screen = pg.display.set_mode((600, 600))
+        self.background = pg.transform.scale(pg.image.load('bg.png'), self.screen.get_size())
+        self.clock = pg.time.Clock()
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+        self.all_sprites = pg.sprite.Group()
+        self.enemy_shots = pg.sprite.Group()
+        self.player_shots = pg.sprite.Group()
+        self.player = Player((100, 100), self.player_shots, self.enemy_shots, self.all_sprites)
+        self.god = God((400, 400), self.player_shots, self.enemy_shots, self.all_sprites)
+        
+        self.run()
+        
+    
+    def run(self):
+        while True:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    exit()
 
-
-# Press the green button in the gutter to run the script.
+            self.update()
+            self.clock.tick(60)
+            pg.display.update()
+            
+    def update(self):
+        self.screen.blit(self.background, (0, 0))
+        self.all_sprites.draw(self.screen)
+        self.all_sprites.update()
+            
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    game = Game()
+    game.run()
