@@ -1,5 +1,7 @@
-from god import *
+from god import Shot
 from healthbar import *
+from movement import *
+
 
 class Player(pg.sprite.Sprite, Movement):
     def __init__(self, pos, player_shots, enemy_shots, *groups):
@@ -9,11 +11,11 @@ class Player(pg.sprite.Sprite, Movement):
         self.speed = 4
         self.max_hp = 100
         self.hp = self.max_hp
-        self.shot_cd = 20   
+        self.shot_cd = 20
         self.curr_shot_cd = self.shot_cd
         self.enemy_shots = enemy_shots
         self.player_shots = player_shots
-        
+
         pg.sprite.Sprite.__init__(self, *groups)
         Movement.__init__(self, self.rect.center, self.speed)
         self.health_bar = HealthBar(*self.groups())
@@ -22,9 +24,9 @@ class Player(pg.sprite.Sprite, Movement):
         # movement update
         keys = pg.key.get_pressed()
         direction_vector = pg.math.Vector2(keys[pg.K_RIGHT] - keys[pg.K_LEFT],
-                                               keys[pg.K_DOWN] - keys[pg.K_UP])
+                                           keys[pg.K_DOWN] - keys[pg.K_UP])
         self.rect.center = self.move(direction_vector)
-        
+
         # shoot update
         self.curr_shot_cd -= 1
         if pg.mouse.get_pressed()[0]:
@@ -38,7 +40,7 @@ class Player(pg.sprite.Sprite, Movement):
             self.health_bar.decrease(shot.damage / self.max_hp)
             if self.hp <= 0:
                 self.kill()
-    
+
     def shoot(self):
         if self.curr_shot_cd <= 0:
             self.curr_shot_cd = self.shot_cd
@@ -47,6 +49,3 @@ class Player(pg.sprite.Sprite, Movement):
             if direction.magnitude() > 0:
                 direction = direction.normalize() * 3
                 Shot(self.rect.center, direction, 10, 4, (0, 125, 200), self.player_shots, *self.groups())
-            
-        
-        

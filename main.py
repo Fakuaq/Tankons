@@ -1,5 +1,3 @@
-import random
-
 from player import *
 from god import *
 
@@ -7,7 +5,7 @@ class Game:
     def __init__(self):
         pg.init()
         self.screen = pg.display.set_mode((600, 600))
-        self.background = pg.transform.scale(pg.image.load('bg.png'), self.screen.get_size())
+        self.background = pg.transform.scale(pg.image.load('assets/bg.png'), self.screen.get_size())
         self.clock = pg.time.Clock()
 
         self.all_sprites = pg.sprite.Group()
