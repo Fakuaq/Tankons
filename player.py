@@ -1,7 +1,7 @@
 from god import Shot
-from healthbar import *
-from movement import *
-
+from healthbar import HealthBar
+from movement import Movement
+import pygame as pg
 
 class Player(pg.sprite.Sprite, Movement):
     def __init__(self, pos, player_shots, enemy_shots, *groups):

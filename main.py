@@ -1,5 +1,6 @@
-from player import *
-from god import *
+from player import Player
+from god import God
+import pygame as pg
 
 class Game:
     def __init__(self):
@@ -15,7 +16,6 @@ class Game:
         self.god = God((400, 400), self.player_shots, self.enemy_shots, self.all_sprites)
         
         self.run()
-        
     
     def run(self):
         while True:

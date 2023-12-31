@@ -1,4 +1,4 @@
-from movement import *
+from movement import Movement
 import pygame as pg
 from random import randint
 
