@@ -1,19 +1,15 @@
 from player import Player
-from god import God
 import pygame as pg
 
 class Game:
     def __init__(self):
         pg.init()
         self.screen = pg.display.set_mode((600, 600))
-        self.background = pg.transform.scale(pg.image.load('assets/bg.png'), self.screen.get_size())
         self.clock = pg.time.Clock()
 
         self.all_sprites = pg.sprite.Group()
-        self.enemy_shots = pg.sprite.Group()
         self.player_shots = pg.sprite.Group()
-        self.player = Player((100, 100), self.player_shots, self.enemy_shots, self.all_sprites)
-        self.god = God((400, 400), self.player_shots, self.enemy_shots, self.all_sprites)
+        self.player = Player((100, 100), self.player_shots, self.all_sprites)
         
         self.run()
     
@@ -29,7 +25,7 @@ class Game:
             pg.display.update()
             
     def update(self):
-        self.screen.blit(self.background, (0, 0))
+        self.screen.fill('white')
         self.all_sprites.draw(self.screen)
         self.all_sprites.update()
             
