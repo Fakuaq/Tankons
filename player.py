@@ -3,13 +3,14 @@ from movement import Movement
 import pygame as pg
 
 class Player(pg.sprite.Sprite, Movement):
+    image = pg.Surface((32, 32))
+    image.fill((0, 125, 200))
+    speed = 4
+    shot_cd = 20
+    curr_shot_cd = shot_cd
+    
     def __init__(self, pos, player_shots, *groups):
-        self.image = pg.Surface((32, 32))
-        self.image.fill((0, 125, 200))
         self.rect = self.image.get_rect(center=pos)
-        self.speed = 4
-        self.shot_cd = 20
-        self.curr_shot_cd = self.shot_cd
         self.player_shots = player_shots
 
         pg.sprite.Sprite.__init__(self, *groups)
