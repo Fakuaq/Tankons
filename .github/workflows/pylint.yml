@@ -25,4 +25,4 @@ jobs:
         pip install pygame
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py') --disable=C,R,E1101,E0511
+        pylint $(git ls-files '*.py') --disable=C,R,E1101,W0511
