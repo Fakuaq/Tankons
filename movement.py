@@ -13,4 +13,9 @@ class Movement:
 
         self._vector += result_v
         return self._vector
+    
+    def reset_move(self, coords: pg.math.Vector2):
+        self._vector = coords
+        
+        return self._vector
         

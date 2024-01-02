@@ -1,4 +1,5 @@
 from player import Player
+from wall import Wall
 import pygame as pg
 
 class Game:
@@ -8,8 +9,13 @@ class Game:
         self.clock = pg.time.Clock()
 
         self.all_sprites = pg.sprite.Group()
-        self.player_shots = pg.sprite.Group()
-        self.player = Player((100, 100), self.player_shots, self.all_sprites)
+        self.shots = pg.sprite.Group()
+        self.walls = pg.sprite.Group()
+        self.player = Player((100, 100), self.shots, self.walls, self.all_sprites)
+
+        # TODO remove these after map rendering is implemented
+        Wall((380, 100), (10, 180), self.walls, self.all_sprites)
+        Wall((300, 90), (90, 10), self.walls, self.all_sprites)
         
         self.run()
     
