@@ -1,5 +1,6 @@
 from shot import Shot
 import pygame as pg
+import math
 
 class Player(pg.sprite.Sprite):
     speed = 3
@@ -48,14 +49,20 @@ class Player(pg.sprite.Sprite):
         if pg.sprite.spritecollideany(self, self.walls):
             self.rect.center -= direction_vector
 
+    def get_turret_position(self, rotation_angle):
+        x_turret = self.rect.centerx - (self.rect.height / 2) * math.sin(math.radians(rotation_angle))
+        y_turret = self.rect.centery - (self.rect.height / 2) * math.cos(math.radians(rotation_angle))
+
+        return int(x_turret), int(y_turret)
+    
     def shoot(self):
         if self.curr_shot_cd > 0:
             return
 
         self.curr_shot_cd = self.shot_cd
-
+        turret_position = self.get_turret_position(self.angle)
         mouse_x, mouse_y = pg.mouse.get_pos()
         direction = pg.math.Vector2(mouse_x - self.rect.centerx, mouse_y - self.rect.centery)
         if direction.magnitude() > 0:
             direction = direction.normalize() * 3
-            Shot(self, self.rect.center, direction, 5, self.shots, *self.groups())
+            Shot(self, turret_position, direction, 5, self.shots, *self.groups())
