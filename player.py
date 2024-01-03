@@ -1,29 +1,36 @@
 from shot import Shot
-from movement import Movement
 import pygame as pg
 
-
-class Player(pg.sprite.Sprite, Movement):
-    image = pg.Surface((32, 32))
-    image.fill((0, 125, 200))
-    speed = 4
+class Player(pg.sprite.Sprite):
+    speed = 3
+    rotation_speed = 4
     shot_cd = 20
     curr_shot_cd = shot_cd
+    angle = 0
 
     def __init__(self, pos, shots, walls, *groups):
+        self.image = pg.image.load('assets/tank_1.png').convert_alpha()
+        self.image_copy = self.image
         self.rect = self.image.get_rect(topleft=pos)
         self.shots = shots
         self.walls = walls
 
         pg.sprite.Sprite.__init__(self, *groups)
-        Movement.__init__(self, self.rect.center, self.speed)
 
     def update(self):
-        # movement update
         keys = pg.key.get_pressed()
-        direction_vector = pg.math.Vector2(keys[pg.K_RIGHT] - keys[pg.K_LEFT],
-                                           keys[pg.K_DOWN] - keys[pg.K_UP])
-        self.rect.center = self.move(direction_vector)
+
+        # rotate sprite
+        rotation = int(keys[pg.K_LEFT] - keys[pg.K_RIGHT])
+        if rotation:
+            self.angle = self.angle % 360 + rotation * self.rotation_speed
+            self.image = pg.transform.rotate(self.image_copy, self.angle)
+            self.rect = self.image.get_rect(center=self.rect.center)
+
+        # movement update
+        direction = int(keys[pg.K_DOWN] - keys[pg.K_UP])
+        direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
+        self.rect.center += direction_vector
 
         # shoot update
         self.curr_shot_cd -= 1
@@ -39,21 +46,7 @@ class Player(pg.sprite.Sprite, Movement):
                 self.kill()
 
         if pg.sprite.spritecollideany(self, self.walls):
-            walls = pg.sprite.spritecollide(self, self.walls, False)
-            new_coords = pg.math.Vector2((self.rect.centerx, self.rect.centery))
-
-            for wall in walls:
-                if abs(wall.rect.left - self.rect.right) <= self.speed:
-                    new_coords.x = wall.rect.left - self.rect.size[0] / 2
-                elif abs(wall.rect.right - self.rect.left) <= self.speed:
-                    new_coords.x = wall.rect.right + self.rect.size[0] / 2
-
-                if abs(wall.rect.top - self.rect.bottom) <= self.speed:
-                    new_coords.y = wall.rect.top - self.rect.size[1] / 2
-                elif abs(wall.rect.bottom - self.rect.top) <= self.speed:
-                    new_coords.y = wall.rect.bottom + self.rect.size[1] / 2
-
-                self.rect.center = self.reset_move(new_coords)
+            self.rect.center -= direction_vector
 
     def shoot(self):
         if self.curr_shot_cd > 0:
