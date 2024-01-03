@@ -8,8 +8,9 @@ class Player(pg.sprite.Sprite):
     curr_shot_cd = shot_cd
     angle = 0
 
-    def __init__(self, pos, shots, walls, *groups):
-        self.image = pg.image.load('assets/tank_1.png').convert_alpha()
+    def __init__(self, identity, controls, pos, shots, walls, *groups):
+        self.image = pg.image.load(f'assets/tank_{identity}.png').convert_alpha()
+        self.controls = controls
         self.image_copy = self.image
         self.rect = self.image.get_rect(topleft=pos)
         self.shots = shots
@@ -21,20 +22,20 @@ class Player(pg.sprite.Sprite):
         keys = pg.key.get_pressed()
 
         # rotate sprite
-        rotation = int(keys[pg.K_LEFT] - keys[pg.K_RIGHT])
+        rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
         if rotation:
             self.angle = self.angle % 360 + rotation * self.rotation_speed
             self.image = pg.transform.rotate(self.image_copy, self.angle)
             self.rect = self.image.get_rect(center=self.rect.center)
 
         # movement update
-        direction = int(keys[pg.K_DOWN] - keys[pg.K_UP])
+        direction = int(keys[self.controls['down']] - keys[self.controls['up']])
         direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
         self.rect.center += direction_vector
 
         # shoot update
         self.curr_shot_cd -= 1
-        if pg.mouse.get_pressed()[0]:
+        if keys[self.controls['shoot']]:
             self.shoot()
 
         # collision detection        
@@ -49,13 +50,9 @@ class Player(pg.sprite.Sprite):
             self.rect.center -= direction_vector
 
     def shoot(self):
-        if self.curr_shot_cd > 0:
-            return
+        if self.curr_shot_cd > 0: return
 
         self.curr_shot_cd = self.shot_cd
-
-        mouse_x, mouse_y = pg.mouse.get_pos()
-        direction = pg.math.Vector2(mouse_x - self.rect.centerx, mouse_y - self.rect.centery)
-        if direction.magnitude() > 0:
-            direction = direction.normalize() * 3
-            Shot(self, self.rect.center, direction, 5, self.shots, *self.groups())
+        
+        direction = pg.math.Vector2(0, 1).rotate(-self.angle + 180)
+        Shot(self, self.rect.center, direction, 5, self.shots, *self.groups())

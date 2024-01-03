@@ -1,5 +1,6 @@
 from player import Player
 from wall import Wall
+from config import controls
 import pygame as pg
 
 class Game:
@@ -11,7 +12,9 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.shots = pg.sprite.Group()
         self.walls = pg.sprite.Group()
-        self.player = Player((100, 100), self.shots, self.walls, self.all_sprites)
+        
+        for i, control_set in enumerate(controls):
+            Player(i + 1, control_set,(100 * (i + 1), 100 * (i + 1)), self.shots, self.walls, self.all_sprites)
 
         # TODO remove these after map rendering is implemented
         Wall((380, 100), (10, 180), self.walls, self.all_sprites)
