@@ -3,8 +3,9 @@ import pygame as pg
 class Shot(pg.sprite.Sprite):
     life_cd = 60 * 3
     current_life_cd = life_cd
-    image = pg.Surface((10, 10))
-    image.fill('black')
+    bullet_radius = 5
+    image = pg.Surface((bullet_radius * 2, bullet_radius * 2), pg.SRCALPHA)
+    pg.draw.circle(image, "black", (bullet_radius, bullet_radius), bullet_radius)
 
     def __init__(self, player, position, direction, speed, *groups):
         self.shot_by = player
