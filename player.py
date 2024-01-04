@@ -4,7 +4,6 @@ import pygame as pg
 import math
 
 class Player(pg.sprite.Sprite):
-    lives = 10
     speed = 3
     rotation_speed = 4
     shot_cd = 20
@@ -47,10 +46,8 @@ class Player(pg.sprite.Sprite):
             shot = pg.sprite.spritecollideany(self, self.shots)
             
             if shot.shot_by is not self:
-                self.lives -= 1
                 shot.kill()
-                if self.lives <= 0:
-                    self.kill_player()
+                self.kill_player()
 
         if pg.sprite.spritecollideany(self, self.walls):
             self.rect.center -= direction_vector
