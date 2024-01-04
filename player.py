@@ -18,7 +18,7 @@ class Player(pg.sprite.Sprite):
         self.image = pg.image.load(f'assets/tank_{identity}.png').convert_alpha()
         self.controls = controls
         self.image_copy = self.image
-        self.rect = self.image.get_rect(topleft=pos)
+        self.rect = self.image.get_rect(center=pos)
         self.shots = shots
         self.walls = walls
         self.player_color = self.get_sprite_color()

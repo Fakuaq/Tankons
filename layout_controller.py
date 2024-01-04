@@ -19,8 +19,8 @@ class LayoutController:
         for i in range(len(layout['wall_positions'])):
             self.walls.append(Wall(layout['wall_positions'][i], layout['wall_sizes'][i], *self.groups))
 
-        for i in range(len(layout['spawns'])):
-            self.spawns.append(pg.Rect(layout['spawns'][i]))
+        for i in range(len(layout['spawn_zones'])):
+            self.spawns.append(pg.Rect(layout['spawn_zones'][i]))
 
     def spawn_coordinates(self, player_count):
         if player_count > len(self.spawns):
@@ -30,10 +30,15 @@ class LayoutController:
             raise RuntimeError('Can\'t call method with uninitialized layout')
 
         coords = []
+        picked_indexes = [] 
         for _ in range(player_count):
             spawn_index = randint(0, len(self.spawns) - 1)
+            
+            while spawn_index in picked_indexes:
+                spawn_index = randint(0, len(self.spawns) - 1)
+            
             rect = self.spawns[spawn_index]
-            self.spawns.pop(spawn_index)
+            picked_indexes.append(spawn_index)
 
             x_range = rect.x + rect.width
             y_range = rect.y + rect.height
