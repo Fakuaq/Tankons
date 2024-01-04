@@ -61,6 +61,12 @@ class Player(pg.sprite.Sprite):
                 shot.kill()
                 self.kill_player()
 
+            if shot.bounces is not 3 and shot.shot_by is self:
+                shot.shot_by.score -= 1
+                shot.kill()
+                self.kill_player()
+
+
         if pg.sprite.spritecollideany(self, self.walls):
             self.rect.center -= direction_vector
 
