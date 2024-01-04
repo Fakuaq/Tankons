@@ -1,4 +1,5 @@
 from shot import Shot
+from particle import Particle
 import pygame as pg
 import math
 
@@ -9,13 +10,14 @@ class Player(pg.sprite.Sprite):
     curr_shot_cd = shot_cd
     angle = 0
 
-    def __init__(self, identity, controls, pos, shots, walls, *groups):
+    def __init__(self, identity, controls, pos, shots, walls, particles, *groups):
         self.image = pg.image.load(f'assets/tank_{identity}.png').convert_alpha()
         self.controls = controls
         self.image_copy = self.image
         self.rect = self.image.get_rect(topleft=pos)
         self.shots = shots
         self.walls = walls
+        self.particles = particles
 
         pg.sprite.Sprite.__init__(self, *groups)
 
@@ -42,14 +44,28 @@ class Player(pg.sprite.Sprite):
         # collision detection        
         if pg.sprite.spritecollideany(self, self.shots):
             shot = pg.sprite.spritecollideany(self, self.shots)
-
+            
             if shot.shot_by is not self:
                 shot.kill()
-                self.kill()
+                self.kill_player()
 
         if pg.sprite.spritecollideany(self, self.walls):
             self.rect.center -= direction_vector
 
+    def kill_player(self):
+        particle_count = 50  
+        particle_speed = 5
+        particle_color = self.get_sprite_color()
+
+        for _ in range(particle_count):
+            particle = Particle(self.rect.centerx, self.rect.centery, particle_color, particle_speed, self.particles, *self.groups())
+            self.particles.add(particle)
+            
+        self.kill()
+        
+    def get_sprite_color(self):
+        return self.image.get_at((int(self.rect.width / 2), int(self.rect.height / 2)))
+    
     def get_turret_position(self, rotation_angle):
         x_turret = self.rect.centerx - (self.rect.height / 2) * math.sin(math.radians(rotation_angle))
         y_turret = self.rect.centery - (self.rect.height / 2) * math.cos(math.radians(rotation_angle))
