@@ -23,7 +23,7 @@ class Game:
         coords = layout_controller.spawn_coordinates(player_count)
         
         for i, control_set in enumerate(controls):
-            player = Player(i + 1, control_set, (coords[i]), self.shots, self.walls, self.all_sprites)
+            player = Player(i + 1, control_set, (coords[i]), self.shots, self.walls, self.player_array, self.all_sprites)
             self.player_array.append(player)
 
         self.run()
