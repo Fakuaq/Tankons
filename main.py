@@ -1,5 +1,6 @@
+import pygame.draw
 from player import Player
-from config import controls
+from config import controls, config
 from layout_controller import LayoutController
 import pygame as pg
 pg.font.init()
@@ -17,10 +18,10 @@ class Game:
         self.players = pg.sprite.Group()
         self.player_array = []
 
-        layout_controller = LayoutController(self.walls, self.all_sprites)
-        layout_controller.generate_layout()
+        self.layout_controller = LayoutController(self.walls, self.all_sprites)
+        self.layout_controller.generate_layout()
         player_count = len(controls)
-        coords = layout_controller.spawn_coordinates(player_count)
+        coords = self.layout_controller.spawn_coordinates(player_count)
         
         for i, control_set in enumerate(controls):
             player = Player(i + 1, control_set, (coords[i]), self.shots, self.walls, self.player_array, self.all_sprites)
@@ -44,6 +45,9 @@ class Game:
         self.draw_player_score()
         self.all_sprites.draw(self.screen)
         self.all_sprites.update()
+
+        if config['debug']:
+            self.debug_draw()
     
     def draw_player_score(self):
         for player in self.player_array:
@@ -52,6 +56,10 @@ class Game:
                 self.screen.blit(score_text, (50,50))
             else:
                 self.screen.blit(score_text, (550 - pg.Surface.get_width(score_text), 50))
+    
+    def debug_draw(self):
+        for rect in self.layout_controller.spawns:
+            pygame.draw.rect(self.screen, (255, 255, 122), rect)
     
 if __name__ == '__main__':
     game = Game()
