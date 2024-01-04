@@ -1,13 +1,13 @@
 from player import Player
-from wall import Wall
 from config import controls
+from layout_controller import LayoutController
 import pygame as pg
 pg.font.init()
 
 class Game:
     def __init__(self):
         pg.init()
-        self.screen = pg.display.set_mode((600, 600))
+        self.screen = pg.display.set_mode((1400, 700))
         self.clock = pg.time.Clock()
 
         self.all_sprites = pg.sprite.Group()
@@ -16,15 +16,16 @@ class Game:
         self.particles = pg.sprite.Group()
         self.players = pg.sprite.Group()
         self.player_array = []
+
+        layout_controller = LayoutController(self.walls, self.all_sprites)
+        layout_controller.generate_layout()
+        player_count = len(controls)
+        coords = layout_controller.spawn_coordinates(player_count)
         
         for i, control_set in enumerate(controls):
-            player = Player(i + 1, control_set,(100 * (i + 1), 100 * (i + 1)), self.shots, self.walls, self.player_array, self.all_sprites)
+            player = Player(i + 1, control_set, (coords[i]), self.shots, self.walls, self.all_sprites)
             self.player_array.append(player)
 
-        # TODO remove these after map rendering is implemented
-        Wall((380, 100), (10, 180), self.walls, self.all_sprites)
-        Wall((300, 90), (90, 10), self.walls, self.all_sprites)
-        
         self.run()
     
     def run(self):
