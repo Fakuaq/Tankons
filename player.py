@@ -61,7 +61,7 @@ class Player(pg.sprite.Sprite):
         particle_color = self.get_sprite_color()
 
         for _ in range(particle_count):
-            particle = Particle(self.rect.centerx, self.rect.centery, particle_color, particle_speed, self.particles, self.groups())
+            particle = Particle(self.rect.centerx, self.rect.centery, particle_color, particle_speed, self.particles, *self.groups())
             self.particles.add(particle)
             
         self.kill()
