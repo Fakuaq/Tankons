@@ -15,4 +15,4 @@ class Particle(pg.sprite.Sprite):
         self.rect.center += self.velocity
         self.lifetime -= 1
         if self.lifetime <= 0:
-	        self.kill()
+            self.kill()
