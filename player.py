@@ -61,6 +61,12 @@ class Player(pg.sprite.Sprite):
                 shot.kill()
                 self.kill_player()
 
+            if shot.bounces is not 3 and shot.shot_by is self:
+                shot.shot_by.score -= 1
+                shot.kill()
+                self.kill_player()
+
+
         if pg.sprite.spritecollideany(self, self.walls):
             self.rect.center -= direction_vector
 
@@ -93,4 +99,4 @@ class Player(pg.sprite.Sprite):
         turret_position = self.get_turret_position(self.angle)
        
         direction = pg.math.Vector2(0, 1).rotate(-self.angle + 180)
-        Shot(self, turret_position, direction, 5, self.shots, *self.groups())
+        Shot(self, turret_position, direction, 5, self.walls, self.shots, *self.groups())
