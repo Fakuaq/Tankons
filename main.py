@@ -12,9 +12,10 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.shots = pg.sprite.Group()
         self.walls = pg.sprite.Group()
+        self.particles = pg.sprite.Group()
         
         for i, control_set in enumerate(controls):
-            Player(i + 1, control_set,(100 * (i + 1), 100 * (i + 1)), self.shots, self.walls, self.all_sprites)
+            Player(i + 1, control_set,(100 * (i + 1), 100 * (i + 1)), self.shots, self.walls, self.particles, self.all_sprites)
 
         # TODO remove these after map rendering is implemented
         Wall((380, 100), (10, 180), self.walls, self.all_sprites)
