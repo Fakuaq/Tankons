@@ -2,6 +2,7 @@ from player import Player
 from config import controls
 from layout_controller import LayoutController
 import pygame as pg
+pg.font.init()
 
 class Game:
     def __init__(self):
@@ -12,6 +13,9 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.shots = pg.sprite.Group()
         self.walls = pg.sprite.Group()
+        self.particles = pg.sprite.Group()
+        self.players = pg.sprite.Group()
+        self.player_array = []
 
         layout_controller = LayoutController(self.walls, self.all_sprites)
         layout_controller.generate_layout()
@@ -19,8 +23,9 @@ class Game:
         coords = layout_controller.spawn_coordinates(player_count)
         
         for i, control_set in enumerate(controls):
-            Player(i + 1, control_set, (coords[i]), self.shots, self.walls, self.all_sprites)
-        
+            player = Player(i + 1, control_set, (coords[i]), self.shots, self.walls, self.all_sprites)
+            self.player_array.append(player)
+
         self.run()
     
     def run(self):
@@ -36,9 +41,18 @@ class Game:
             
     def update(self):
         self.screen.fill('white')
+        self.draw_player_score()
         self.all_sprites.draw(self.screen)
         self.all_sprites.update()
-            
+    
+    def draw_player_score(self):
+        for player in self.player_array:
+            score_text = player.score_text
+            if player.identity == 2:
+                self.screen.blit(score_text, (50,50))
+            else:
+                self.screen.blit(score_text, (550 - pg.Surface.get_width(score_text), 50))
+    
 if __name__ == '__main__':
     game = Game()
     game.run()
