@@ -93,4 +93,4 @@ class Player(pg.sprite.Sprite):
         turret_position = self.get_turret_position(self.angle)
        
         direction = pg.math.Vector2(0, 1).rotate(-self.angle + 180)
-        Shot(self, turret_position, direction, 5, self.walls, *self.groups())
+        Shot(self, turret_position, direction, 5, self.shots, *self.groups())
