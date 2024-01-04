@@ -13,7 +13,7 @@ class Player(pg.sprite.Sprite):
     angle = 0
     font = pg.font.SysFont("San Francisco", 30)
 
-    def __init__(self, identity, controls, pos, shots, walls, *groups):
+    def __init__(self, identity, controls, pos, shots, walls, players, *groups):
         self.identity = identity
         self.image = pg.image.load(f'assets/tank_{identity}.png').convert_alpha()
         self.controls = controls
@@ -23,10 +23,15 @@ class Player(pg.sprite.Sprite):
         self.walls = walls
         self.player_color = self.get_sprite_color()
         self.score_text = self.font.render(f"Score: {self.score}", 1, self.player_color)
+        self.all_players = players
+        self.other_players = []
 
         pg.sprite.Sprite.__init__(self, *groups)
 
     def update(self):
+        if not self.other_players:
+            self.other_players = [player for player in self.all_players if player != self]
+            
         keys = pg.key.get_pressed()
         self.score_text = self.font.render(f"Score: {self.score}", 1, self.player_color)
 
@@ -58,6 +63,9 @@ class Player(pg.sprite.Sprite):
 
         if pg.sprite.spritecollideany(self, self.walls):
             self.rect.center -= direction_vector
+
+        if pg.sprite.spritecollideany(self, self.other_players):
+            self.rect.center -= 1.1 * direction_vector
 
     def kill_player(self):
         particle_count = 50  
