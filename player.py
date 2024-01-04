@@ -10,14 +10,13 @@ class Player(pg.sprite.Sprite):
     curr_shot_cd = shot_cd
     angle = 0
 
-    def __init__(self, identity, controls, pos, shots, walls, particles, *groups):
+    def __init__(self, identity, controls, pos, shots, walls, *groups):
         self.image = pg.image.load(f'assets/tank_{identity}.png').convert_alpha()
         self.controls = controls
         self.image_copy = self.image
         self.rect = self.image.get_rect(topleft=pos)
         self.shots = shots
         self.walls = walls
-        self.particles = particles
 
         pg.sprite.Sprite.__init__(self, *groups)
 
@@ -58,8 +57,7 @@ class Player(pg.sprite.Sprite):
         particle_color = self.get_sprite_color()
 
         for _ in range(particle_count):
-            particle = Particle(self.rect.centerx, self.rect.centery, particle_color, particle_speed, self.particles, *self.groups())
-            self.particles.add(particle)
+            Particle(self.rect.centerx, self.rect.centery, particle_color, particle_speed, *self.groups())
             
         self.kill()
         
