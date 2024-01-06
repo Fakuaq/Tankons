@@ -2,7 +2,6 @@ from shot import Shot
 from particle import Particle
 import pygame as pg
 import math
-pg.font.init()
 
 class Player(pg.sprite.Sprite):
     speed = 3
@@ -10,7 +9,6 @@ class Player(pg.sprite.Sprite):
     shot_cd = 20
     curr_shot_cd = shot_cd
     angle = 0
-    font = pg.font.SysFont("San Francisco", 30)
 
     def __init__(self, identity, score, controls, pos, shots, walls, players, *groups):
         self.score = score
@@ -22,7 +20,6 @@ class Player(pg.sprite.Sprite):
         self.shots = shots
         self.walls = walls
         self.player_color = self.get_sprite_color()
-        self.score_text = self.font.render(f"Score: {self.score}", 1, self.player_color)
         self.players = players
         self.groups = groups
 
@@ -30,7 +27,6 @@ class Player(pg.sprite.Sprite):
 
     def update(self):
         keys = pg.key.get_pressed()
-        self.score_text = self.font.render(f"Score: {self.score}", 1, self.player_color)
 
         # rotate sprite
         rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
@@ -53,12 +49,7 @@ class Player(pg.sprite.Sprite):
         if pg.sprite.spritecollideany(self, self.shots):
             shot = pg.sprite.spritecollideany(self, self.shots)
             
-            if shot.shot_by is not self:
-                shot.shot_by.score += 1
-                shot.kill()
-                self.kill_player()
-
-            if shot.bounces != 3 and shot.shot_by is self:
+            if shot.shot_by is not self or (shot.bounces != 3 and shot.shot_by is self):
                 shot.kill()
                 self.kill_player()
 

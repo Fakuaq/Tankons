@@ -23,8 +23,8 @@ class GameController:
         self.particles = pg.sprite.Group()
         self.players = pg.sprite.Group()
 
-        self.layout_controller = LayoutController(self.walls, self.all_sprites)
-        self.player_controller = PlayerController(self.scores, self.walls, self.shots, self.players, self.all_sprites)
+        self.layout_controller = LayoutController(self.screen, self.walls, self.all_sprites)
+        self.player_controller = PlayerController(self.screen, self.scores, self.walls, self.shots, self.players, self.all_sprites)
 
         self.start_game()
 
@@ -35,9 +35,10 @@ class GameController:
 
     def update(self):
         self.screen.fill('white')
-        self.draw_player_score()
         self.all_sprites.draw(self.screen)
         self.all_sprites.update()
+        self.player_controller.draw_scoreboard()
+        
         self.game_reset_time -= 1
 
         if not self.game_resetting:
@@ -48,33 +49,19 @@ class GameController:
             self.reset_game()
 
         if config['debug']:
-            self.debug_draw()
+            self.layout_controller.draw_spawn_areas()
 
     def check_winner(self):
         last_player = self.player_controller.last_player_standing()
 
-        if last_player == 0:  # game is a draw
+        if last_player == 0 or isinstance(last_player, Player):
             self.game_resetting = True
             self.game_reset_time = self.game_reset_cd
-        elif isinstance(last_player, Player):
+        if isinstance(last_player, Player):
             self.scores[last_player.identity] += 1
-            self.game_resetting = True
-            self.game_reset_time = self.game_reset_cd
 
     def reset_game(self):
         for sprite in self.all_sprites:
             sprite.kill()
 
         self.start_game()
-
-    def draw_player_score(self):
-        margins = 200
-        start_pos = 50
-
-        for i, player in enumerate(self.players):
-            x_position = (pg.Surface.get_width(player.score_text) + margins) * i + start_pos
-            self.screen.blit(player.score_text, (x_position, start_pos))
-
-    def debug_draw(self):
-        for rect in self.layout_controller.spawns:
-            pg.draw.rect(self.screen, (255, 255, 122), rect)
