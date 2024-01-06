@@ -8,7 +8,8 @@ class LayoutController:
     walls = []
     spawns = []
     
-    def __init__(self, *groups):
+    def __init__(self, screen, *groups):
+        self.screen = screen
         self.groups = groups
 
     def generate_layout(self):
@@ -49,3 +50,8 @@ class LayoutController:
             coords.append((x_pos, y_pos))
 
         return coords
+    
+    def draw_spawn_areas(self):
+        for rect in self.spawns:
+            pg.draw.rect(self.screen, (255, 255, 122), rect)
+        
