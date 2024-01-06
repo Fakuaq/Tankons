@@ -5,7 +5,6 @@ import pygame as pg
 
 
 class LayoutController:
-    active_layout = False
     walls = []
     spawns = []
     
@@ -13,6 +12,8 @@ class LayoutController:
         self.groups = groups
 
     def generate_layout(self):
+        self.spawns = []
+        
         layout_index = randint(0, len(layouts) - 1)
         layout = layouts[layout_index]
 
@@ -48,8 +49,3 @@ class LayoutController:
             coords.append((x_pos, y_pos))
 
         return coords
-
-    def remove_layout(self):
-        self.spawns = []
-        for wall in self.walls:
-            wall.kill()
