@@ -5,7 +5,6 @@ import math
 pg.font.init()
 
 class Player(pg.sprite.Sprite):
-    score = 0
     speed = 3
     rotation_speed = 4
     shot_cd = 20
@@ -13,7 +12,8 @@ class Player(pg.sprite.Sprite):
     angle = 0
     font = pg.font.SysFont("San Francisco", 30)
 
-    def __init__(self, identity, controls, pos, shots, walls, players, *groups):
+    def __init__(self, identity, score, controls, pos, shots, walls, players, *groups):
+        self.score = score
         self.identity = identity
         self.image = pg.image.load(f'assets/tank_{identity}.png').convert_alpha()
         self.image_copy = self.image
