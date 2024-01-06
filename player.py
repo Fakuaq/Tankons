@@ -28,17 +28,18 @@ class Player(pg.sprite.Sprite):
     def update(self):
         keys = pg.key.get_pressed()
 
-        # rotate sprite
-        rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
-        if rotation:
-            self.angle = self.angle % 360 + rotation * self.rotation_speed
-            self.image = pg.transform.rotate(self.image_copy, self.angle)
-            self.rect = self.image.get_rect(center=self.rect.center)
-
         # movement update
         direction = int(keys[self.controls['down']] - keys[self.controls['up']])
         direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
         self.rect.center += direction_vector
+
+        # rotate sprite
+        rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
+        rotation = rotation if direction != 1 else rotation * -1 # flip rotation if moving backwards
+        if rotation:
+            self.angle = self.angle % 360 + rotation * self.rotation_speed
+            self.image = pg.transform.rotate(self.image_copy, self.angle)
+            self.rect = self.image.get_rect(center=self.rect.center)
 
         # shoot update
         self.curr_shot_cd -= 1
