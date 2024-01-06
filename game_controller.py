@@ -1,5 +1,3 @@
-import time
-from time import sleep
 import pygame as pg
 from config import config
 from player import Player
