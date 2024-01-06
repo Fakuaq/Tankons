@@ -16,7 +16,6 @@ class Game:
         self.walls = pg.sprite.Group()
         self.particles = pg.sprite.Group()
         self.players = pg.sprite.Group()
-        self.player_array = []
 
         self.layout_controller = LayoutController(self.walls, self.all_sprites)
         self.layout_controller.generate_layout()
@@ -24,8 +23,7 @@ class Game:
         coords = self.layout_controller.spawn_coordinates(player_count)
         
         for i, control_set in enumerate(controls):
-            player = Player(i + 1, control_set, (coords[i]), self.shots, self.walls, self.player_array, self.all_sprites)
-            self.player_array.append(player)
+            Player(i + 1, control_set, (coords[i]), self.shots, self.walls, self.players, self.all_sprites)
 
         self.run()
     
@@ -50,12 +48,12 @@ class Game:
             self.debug_draw()
     
     def draw_player_score(self):
-        for player in self.player_array:
-            score_text = player.score_text
-            if player.identity == 2:
-                self.screen.blit(score_text, (50,50))
-            else:
-                self.screen.blit(score_text, (550 - pg.Surface.get_width(score_text), 50))
+        margins = 200
+        start_pos = 50
+        
+        for i, player in enumerate(self.players):
+            x_position = (pg.Surface.get_width(player.score_text) + margins) * i + start_pos
+            self.screen.blit(player.score_text, (x_position, start_pos))
     
     def debug_draw(self):
         for rect in self.layout_controller.spawns:

@@ -16,22 +16,19 @@ class Player(pg.sprite.Sprite):
     def __init__(self, identity, controls, pos, shots, walls, players, *groups):
         self.identity = identity
         self.image = pg.image.load(f'assets/tank_{identity}.png').convert_alpha()
-        self.controls = controls
         self.image_copy = self.image
+        self.controls = controls
         self.rect = self.image.get_rect(center=pos)
         self.shots = shots
         self.walls = walls
         self.player_color = self.get_sprite_color()
         self.score_text = self.font.render(f"Score: {self.score}", 1, self.player_color)
-        self.all_players = players
-        self.other_players = []
+        self.players = players
+        self.groups = groups
 
-        pg.sprite.Sprite.__init__(self, *groups)
+        pg.sprite.Sprite.__init__(self, self.players, *self.groups)
 
     def update(self):
-        if not self.other_players:
-            self.other_players = [player for player in self.all_players if player != self]
-            
         keys = pg.key.get_pressed()
         self.score_text = self.font.render(f"Score: {self.score}", 1, self.player_color)
 
@@ -52,7 +49,7 @@ class Player(pg.sprite.Sprite):
         if keys[self.controls['shoot']]:
             self.shoot()
 
-        # collision detection        
+        # shot collision        
         if pg.sprite.spritecollideany(self, self.shots):
             shot = pg.sprite.spritecollideany(self, self.shots)
             
@@ -61,17 +58,19 @@ class Player(pg.sprite.Sprite):
                 shot.kill()
                 self.kill_player()
 
-            if shot.bounces is not 3 and shot.shot_by is self:
-                shot.shot_by.score -= 1
+            if shot.bounces != 3 and shot.shot_by is self:
                 shot.kill()
                 self.kill_player()
 
-
+        # wall collision
         if pg.sprite.spritecollideany(self, self.walls):
             self.rect.center -= direction_vector
 
-        if pg.sprite.spritecollideany(self, self.other_players):
-            self.rect.center -= 1.1 * direction_vector
+        # player collision
+        if pg.sprite.spritecollide(self, self.players, False):
+            players = pg.sprite.spritecollide(self, self.players, False)
+            if self not in players:
+                self.rect.center -= 1.1 * direction_vector
 
     def kill_player(self):
         particle_count = 50  
@@ -79,7 +78,7 @@ class Player(pg.sprite.Sprite):
         particle_color = self.player_color
 
         for _ in range(particle_count):
-            Particle(self.rect.centerx, self.rect.centery, particle_color, particle_speed, *self.groups())
+            Particle(self.rect.centerx, self.rect.centery, particle_color, particle_speed, *self.groups)
             
         self.kill()
         
@@ -99,4 +98,4 @@ class Player(pg.sprite.Sprite):
         turret_position = self.get_turret_position(self.angle)
        
         direction = pg.math.Vector2(0, 1).rotate(-self.angle + 180)
-        Shot(self, turret_position, direction, 5, self.walls, self.shots, *self.groups())
+        Shot(self, turret_position, direction, 5, self.walls, self.shots, *self.groups)
