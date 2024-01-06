@@ -3,6 +3,7 @@ from config import config
 from player import Player
 from layout_controller import LayoutController
 from player_controller import PlayerController
+from powerups.powerup_controller import PowerupController
 
 
 class GameController:
@@ -10,6 +11,8 @@ class GameController:
     game_resetting = False
     game_reset_cd = 60
     game_reset_time = game_reset_cd
+    powerup_stat_cd = 60 * 5
+    curr_powerup_stat_cd = powerup_stat_cd
     
     def __init__(self, screen):
         self.screen = screen
@@ -22,9 +25,11 @@ class GameController:
         self.walls = pg.sprite.Group()
         self.particles = pg.sprite.Group()
         self.players = pg.sprite.Group()
+        self.powerups = pg.sprite.Group()
 
         self.layout_controller = LayoutController(self.screen, self.walls, self.all_sprites)
         self.player_controller = PlayerController(self.screen, self.scores, self.walls, self.shots, self.players, self.all_sprites)
+        self.powerup_controller = PowerupController(self.powerups, self.players, self.all_sprites)
 
         self.start_game()
 
@@ -40,6 +45,13 @@ class GameController:
         self.player_controller.draw_scoreboard()
         
         self.game_reset_time -= 1
+        self.curr_powerup_stat_cd -= 1
+
+        if self.curr_powerup_stat_cd < 0:
+            self.curr_powerup_stat_cd = self.powerup_stat_cd
+            coords = self.layout_controller.powerup_coordinates(self.powerups)
+            if coords:
+                self.powerup_controller.spawn_powerup(coords)
 
         if not self.game_resetting:
             self.check_winner()

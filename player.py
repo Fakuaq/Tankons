@@ -9,6 +9,8 @@ class Player(pg.sprite.Sprite):
     shot_cd = 20
     curr_shot_cd = shot_cd
     angle = 0
+    stats_powerups = []
+    weapon_powerup = None
 
     def __init__(self, identity, score, controls, pos, shots, walls, players, *groups):
         self.score = score
@@ -63,6 +65,10 @@ class Player(pg.sprite.Sprite):
             players = pg.sprite.spritecollide(self, self.players, False)
             if self not in players:
                 self.rect.center -= 1.1 * direction_vector
+                
+        # powerup update
+        for powerup in self.stats_powerups:
+            powerup.update()
 
     def kill_player(self):
         particle_count = 50  
@@ -91,3 +97,9 @@ class Player(pg.sprite.Sprite):
        
         direction = pg.math.Vector2(0, 1).rotate(-self.angle + 180)
         Shot(self, turret_position, direction, 5, self.walls, self.shots, *self.groups)
+
+    def add_stats_powerup(self, powerup):
+        self.stats_powerups.append(powerup)
+        
+    def remove_stats_powerup(self, powerup):
+        self.stats_powerups.remove(powerup)
