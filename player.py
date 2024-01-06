@@ -5,7 +5,7 @@ import math
 
 class Player(pg.sprite.Sprite):
     speed = 3
-    rotation_speed = 4
+    rotation_speed = 3
     shot_cd = 20
     curr_shot_cd = shot_cd
     angle = 0
@@ -19,6 +19,7 @@ class Player(pg.sprite.Sprite):
         self.image_copy = self.image
         self.controls = controls
         self.rect = self.image.get_rect(center=pos)
+        self.position = pg.math.Vector2((self.rect.centerx, self.rect.centery))
         self.shots = shots
         self.walls = walls
         self.player_color = self.get_sprite_color()
@@ -33,7 +34,8 @@ class Player(pg.sprite.Sprite):
         # movement update
         direction = int(keys[self.controls['down']] - keys[self.controls['up']])
         direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
-        self.rect.center += direction_vector
+        self.position += direction_vector
+        self.rect.center = int(self.position.x), int(self.position.y)
 
         # rotate sprite
         rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
@@ -58,13 +60,15 @@ class Player(pg.sprite.Sprite):
 
         # wall collision
         if pg.sprite.spritecollideany(self, self.walls):
-            self.rect.center -= direction_vector
+            self.position -= direction_vector
+            self.rect.center = int(self.position.x), int(self.position.y)
 
         # player collision
         if pg.sprite.spritecollide(self, self.players, False):
             players = pg.sprite.spritecollide(self, self.players, False)
             if self not in players:
-                self.rect.center -= 1.1 * direction_vector
+                self.position -= 1.1 * direction_vector
+                self.rect.center = int(self.position.x), int(self.position.y)
                 
         # powerup update
         for powerup in self.stats_powerups:
