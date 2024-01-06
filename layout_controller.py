@@ -1,5 +1,5 @@
 from config import layouts
-from random import randint
+from random import randint, shuffle
 from wall import Wall
 import pygame as pg
 
@@ -7,6 +7,7 @@ import pygame as pg
 class LayoutController:
     walls = []
     spawns = []
+    powerup_zones = []
     
     def __init__(self, screen, *groups):
         self.screen = screen
@@ -14,6 +15,7 @@ class LayoutController:
 
     def generate_layout(self):
         self.spawns = []
+        self.powerup_zones = []
         
         layout_index = randint(0, len(layouts) - 1)
         layout = layouts[layout_index]
@@ -23,6 +25,9 @@ class LayoutController:
 
         for i in range(len(layout['spawn_zones'])):
             self.spawns.append(pg.Rect(layout['spawn_zones'][i]))
+
+        for i in range(len(layout['powerup_zones'])):
+            self.powerup_zones.append(pg.Rect(layout['powerup_zones'][i]))
 
     def spawn_coordinates(self, player_count):
         if player_count > len(self.spawns):
@@ -54,4 +59,25 @@ class LayoutController:
     def draw_spawn_areas(self):
         for rect in self.spawns:
             pg.draw.rect(self.screen, (255, 255, 122), rect)
+
+    def powerup_coordinates(self, powerups):
+        if len(powerups) >= len(self.powerup_zones): return
+
+        zone_without_powerup = False
+        shuffle(self.powerup_zones)
         
+        for zone in self.powerup_zones:
+            if not len(powerups):
+                zone_without_powerup = True
+            
+            for powerup in powerups:
+                if not powerup.rect.colliderect(zone):
+                    zone_without_powerup = True
+
+            if zone_without_powerup:
+                x_range = zone.x + zone.width
+                y_range = zone.y + zone.height
+                x_pos = randint(zone.x, x_range)    
+                y_pos = randint(zone.y, y_range)
+    
+                return x_pos, y_pos
