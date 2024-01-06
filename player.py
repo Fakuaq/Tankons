@@ -1,5 +1,6 @@
 from shot import Shot
 from particle import Particle
+from sound_controller import Sounds
 import pygame as pg
 import math
 
@@ -74,6 +75,7 @@ class Player(pg.sprite.Sprite):
         particle_count = 50  
         particle_speed = 5
         particle_color = self.player_color
+        Sounds.death_sound(self)
 
         for _ in range(particle_count):
             Particle(self.rect.centerx, self.rect.centery, particle_color, particle_speed, *self.groups)
@@ -97,6 +99,7 @@ class Player(pg.sprite.Sprite):
        
         direction = pg.math.Vector2(0, 1).rotate(-self.angle + 180)
         Shot(self, turret_position, direction, 5, self.walls, self.shots, *self.groups)
+        Sounds.shoot_sound(self)
 
     def add_stats_powerup(self, powerup):
         self.stats_powerups.append(powerup)

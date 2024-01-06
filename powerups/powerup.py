@@ -1,6 +1,7 @@
 import pygame as pg
 from powerups.stats_powerup import StatsPowerup
 from typing import Type
+from sound_controller import Sounds
 
 class Powerup(pg.sprite.Sprite):
     base_path = 'assets/powerups/'
@@ -21,4 +22,5 @@ class Powerup(pg.sprite.Sprite):
                 powerup = collided_powerup.powerup(player) # instantiate powerup
                 player.add_stats_powerup(powerup)
                 collided_powerup.kill()
+                Sounds.powerup_sound(self)
         
