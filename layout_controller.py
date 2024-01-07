@@ -75,7 +75,10 @@ class LayoutController:
                 zone_without_powerup = True
             
             for powerup in powerups:
-                if not powerup.rect.colliderect(zone):
+                if powerup.rect.colliderect(zone):
+                    zone_without_powerup = False
+                    break
+                else:
                     zone_without_powerup = True
 
             if zone_without_powerup:
