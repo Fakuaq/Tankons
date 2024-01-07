@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
 class StatsPowerup(ABC):
+    powerup_type = 'stats'
+    
     def __init__(self, player, cooldown):
         self.cooldown = cooldown
         self.player = player
