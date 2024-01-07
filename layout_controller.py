@@ -60,6 +60,10 @@ class LayoutController:
         for rect in self.spawns:
             pg.draw.rect(self.screen, (255, 255, 122), rect)
 
+    def draw_powerup_areas(self):
+        for rect in self.powerup_zones:
+            pg.draw.rect(self.screen, (63, 112, 77), rect)
+
     def powerup_coordinates(self, powerups):
         if len(powerups) >= len(self.powerup_zones): return
 
