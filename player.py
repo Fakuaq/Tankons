@@ -1,12 +1,15 @@
 from shot import Shot
 from particle import Particle
-from sound_controller import Sounds
+from sound_controller import SoundController
 import pygame as pg
 import math
 
 class Player(pg.sprite.Sprite):
     speed = 3
     rotation_speed = 3
+    shot_bounces = 3
+    shot_radius = 5.5
+    shot_speed = 5
     shot_cd = 20
     curr_shot_cd = shot_cd
     angle = 0
@@ -49,13 +52,16 @@ class Player(pg.sprite.Sprite):
         # shoot update
         self.curr_shot_cd -= 1
         if keys[self.controls['shoot']]:
-            self.shoot()
+            if self.weapon_powerup:
+                self.weapon_powerup.shoot()
+            else:
+                self.shoot()
 
         # shot collision        
         if pg.sprite.spritecollideany(self, self.shots):
             shot = pg.sprite.spritecollideany(self, self.shots)
             
-            if shot.shot_by is not self or (shot.bounces != 3 and shot.shot_by is self):
+            if shot.shot_by is not self or (shot.bounces != 0 and shot.shot_by is self):
                 shot.kill()
                 self.kill_player()
 
@@ -72,14 +78,15 @@ class Player(pg.sprite.Sprite):
                 self.rect.center = int(self.position.x), int(self.position.y)
                 
         # powerup update
-        for powerup in self.stats_powerups:
-            powerup.update()
+        for powerup in self.stats_powerups + [self.weapon_powerup]:
+            if powerup:
+                powerup.update()
 
     def kill_player(self):
-        particle_count = 50  
+        particle_count = 50
         particle_speed = 5
         particle_color = self.player_color
-        Sounds.death_sound(self)
+        SoundController.death_sound()
 
         for _ in range(particle_count):
             Particle(self.rect.centerx, self.rect.centery, particle_color, particle_speed, *self.groups)
@@ -89,9 +96,9 @@ class Player(pg.sprite.Sprite):
     def get_sprite_color(self):
         return self.image.get_at((int(self.rect.width / 2 + 5), int(self.rect.height / 2)))
     
-    def get_turret_position(self, rotation_angle):
-        x_turret = self.rect.centerx - (self.rect.height / 2) * math.sin(math.radians(rotation_angle))
-        y_turret = self.rect.centery - (self.rect.height / 2) * math.cos(math.radians(rotation_angle))
+    def get_turret_position(self):
+        x_turret = self.rect.centerx - (self.rect.height / 2) * math.sin(math.radians(self.angle))
+        y_turret = self.rect.centery - (self.rect.height / 2) * math.cos(math.radians(self.angle))
 
         return int(x_turret), int(y_turret)
     
@@ -99,11 +106,11 @@ class Player(pg.sprite.Sprite):
         if self.curr_shot_cd > 0: return
 
         self.curr_shot_cd = self.shot_cd
-        turret_position = self.get_turret_position(self.angle)
+        turret_position = self.get_turret_position()
        
         direction = pg.math.Vector2(0, 1).rotate(-self.angle + 180)
-        Shot(self, turret_position, direction, 5, self.walls, self.shots, *self.groups)
-        Sounds.shoot_sound(self)
+        Shot(self, turret_position, direction, self.shot_bounces, self.shot_radius, self.shot_speed, self.walls, self.shots, *self.groups)
+        SoundController.shoot_sound()
 
     def add_stats_powerup(self, powerup):
         self.stats_powerups.append(powerup)

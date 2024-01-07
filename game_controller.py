@@ -29,7 +29,7 @@ class GameController:
 
         self.layout_controller = LayoutController(self.screen, self.walls, self.all_sprites)
         self.player_controller = PlayerController(self.screen, self.scores, self.walls, self.shots, self.players, self.all_sprites)
-        self.powerup_controller = PowerupController(self.powerups, self.players, self.all_sprites)
+        self.powerup_controller = PowerupController(self.powerups, self.players, self.walls, self.all_sprites)
 
         self.start_game()
 
