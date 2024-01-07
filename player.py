@@ -78,7 +78,7 @@ class Player(pg.sprite.Sprite):
                 self.rect.center = int(self.position.x), int(self.position.y)
                 
         # powerup update
-        for powerup in self.stats_powerups + [self.weapon_powerup]:
+        for powerup in self.stats_powerups.copy() + [self.weapon_powerup]:
             if powerup:
                 powerup.update()
 
