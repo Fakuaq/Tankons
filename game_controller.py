@@ -62,6 +62,7 @@ class GameController:
 
         if config['debug']:
             self.layout_controller.draw_spawn_areas()
+            self.layout_controller.draw_powerup_areas()
 
     def check_winner(self):
         last_player = self.player_controller.last_player_standing()
