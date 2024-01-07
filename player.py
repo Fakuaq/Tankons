@@ -78,9 +78,10 @@ class Player(pg.sprite.Sprite):
                 self.rect.center = int(self.position.x), int(self.position.y)
                 
         # powerup update
-        for powerup in self.stats_powerups.copy() + [self.weapon_powerup]:
-            if powerup:
-                powerup.update()
+        for powerup in self.stats_powerups.copy():
+            powerup.update()
+        if self.weapon_powerup:
+            self.weapon_powerup.update()
 
     def kill_player(self):
         particle_count = 50

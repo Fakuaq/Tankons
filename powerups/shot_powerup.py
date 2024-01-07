@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
 class ShotPowerup(ABC):
+    powerup_type = 'shot'
+    
     def __init__(self, player, cooldown, shot):
         self.cooldown = cooldown
         self.player = player
