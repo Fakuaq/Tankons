@@ -9,8 +9,8 @@ class ArrowShot(ShotPowerup):
     
     def __init__(self, player):
         super().__init__(player, self.cooldown, self.shot)
-        self.angle_positive = None
-        self.angle_negative = None
+        self.angle_positive = self.player.angle
+        self.angle_negative = self.player.angle
         
     def shoot(self):
         if not self.shot:
