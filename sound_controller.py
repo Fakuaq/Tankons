@@ -2,11 +2,11 @@ import pygame as pg
 import random
 
 
-class Sounds:
-
-    def death_sound(self):
-        type = random.randint(1,4)
-        match type:
+class SoundController:
+    @classmethod
+    def death_sound(cls):
+        sound_type = random.randint(1,4)
+        match sound_type:
             case 1:
                 sound = pg.mixer.Sound("sounds/Die1.wav")
                 pg.mixer.Sound.play(sound)
@@ -20,9 +20,10 @@ class Sounds:
                 sound = pg.mixer.Sound("sounds/Die4.wav")
                 pg.mixer.Sound.play(sound)
 
-    def shoot_sound(self):
-        type = random.randint(1,3)
-        match type:
+    @classmethod
+    def shoot_sound(cls):
+        sound_type = random.randint(1,3)
+        match sound_type:
             case 1:
                 sound = pg.mixer.Sound("sounds/Shoot1.wav")
                 pg.mixer.Sound.play(sound)
@@ -36,9 +37,10 @@ class Sounds:
                 sound = pg.mixer.Sound("sounds/Shoot4.wav")
                 pg.mixer.Sound.play(sound)
 
-    def powerup_sound(self):
-        type = random.randint(1,3)
-        match type:
+    @classmethod
+    def powerup_sound(cls):
+        sound_type = random.randint(1,3)
+        match sound_type:
             case 1:
                 sound = pg.mixer.Sound("sounds/Powerup1.wav")
                 pg.mixer.Sound.play(sound)
