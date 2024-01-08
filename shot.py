@@ -54,7 +54,8 @@ class Shot(pg.sprite.Sprite):
                 self.rect.left = collided_wall.rect.right
 
             if self.bounces == self.max_bounces:
-                return self.kill()
-            
+                self.kill()
+                return
+
             self.position.update(self.rect.centerx, self.rect.centery)
             self.bounces += 1
