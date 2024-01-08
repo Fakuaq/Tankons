@@ -31,7 +31,8 @@ class Shot(pg.sprite.Sprite):
         if self.current_life_cd <= 0:
             self.kill()
 
-        for collided_wall in pg.sprite.spritecollide(self, self.walls, False):
+        collided_wall = pg.sprite.spritecollideany(self, self.walls)
+        if collided_wall:
             overlap_top = abs(self.rect.bottom - collided_wall.rect.top)
             overlap_bottom = abs(self.rect.top - collided_wall.rect.bottom)
             overlap_left = abs(self.rect.right - collided_wall.rect.left)
@@ -54,4 +55,6 @@ class Shot(pg.sprite.Sprite):
 
             if self.bounces == self.max_bounces:
                 return self.kill()
+            
+            self.position.update(self.rect.centerx, self.rect.centery)
             self.bounces += 1
