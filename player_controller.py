@@ -35,6 +35,20 @@ class PlayerController:
     font = pg.font.SysFont("San Francisco", 60)
     
     def __init__(self, screen, scores, walls, shots, players, all_sprites):
+        """
+        Initializes the PlayerController object with the specified parameters.
+
+        Parameters:
+            - screen: The pygame screen on which the game is displayed.
+            - scores (dict): A dictionary to store player scores.
+            - walls (Group): The group containing Wall objects in the game.
+            - shots (Group): The group containing Shot objects in the game.
+            - players (Group): The group containing Player objects in the game.
+            - all_sprites (Group): The group containing all sprites in the game.
+
+        Returns:
+            None
+        """
         self.screen = screen
         self.scores = scores
         self.walls = walls
