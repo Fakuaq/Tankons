@@ -8,7 +8,7 @@ class Player(pg.sprite.Sprite):
     speed = 3
     rotation_speed = 3
     shot_bounces = 3
-    shot_radius = 5.6
+    shot_radius = 5.5
     shot_speed = 5
     shot_cd = 20
     curr_shot_cd = shot_cd
@@ -88,9 +88,10 @@ class Player(pg.sprite.Sprite):
         # player collision
         if pg.sprite.spritecollide(self, self.players, False):
             players = pg.sprite.spritecollide(self, self.players, False)
-            if self not in players:
-                self.position -= 1.1 * direction_vector
-                self.rect.center = int(self.position.x), int(self.position.y)
+            for player in players:
+                if player is not self:
+                    self.position -= 1.1 * direction_vector
+                    self.rect.center = int(self.position.x), int(self.position.y)
                 
         # powerup update
         for powerup in self.stats_powerups.copy():
