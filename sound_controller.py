@@ -50,3 +50,13 @@ class SoundController:
             case 3:
                 sound = pg.mixer.Sound("sounds/Powerup3.wav")
                 pg.mixer.Sound.play(sound)
+
+    @classmethod
+    def powerup_bigshot_sound(cls):
+        sound = pg.mixer.Sound("sounds/Bigshot.wav")
+        pg.mixer.Sound.play(sound)
+
+    @classmethod
+    def powerup_arrowshot_sound(cls):
+        sound = pg.mixer.Sound("sounds/ArrowShot.wav")
+        pg.mixer.Sound.play(sound)
