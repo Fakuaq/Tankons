@@ -5,9 +5,12 @@ import pygame as pg
 class Game:
     def __init__(self):
         pg.init()
+        pg.display.set_caption('Tankons')
+        logo = pg.image.load('assets/tank_1.png')
+        pg.display.set_icon(logo)
         screen = pg.display.set_mode((1400, 700))
+        
         self.clock = pg.time.Clock()
-
         self.game_controller = GameController(screen)
 
         self.run()
