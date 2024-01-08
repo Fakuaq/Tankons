@@ -8,7 +8,7 @@ class Player(pg.sprite.Sprite):
     speed = 3
     rotation_speed = 3
     shot_bounces = 3
-    shot_radius = 5.5
+    shot_radius = 5.6
     shot_speed = 5
     shot_cd = 20
     curr_shot_cd = shot_cd

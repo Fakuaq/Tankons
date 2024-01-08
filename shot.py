@@ -31,34 +31,27 @@ class Shot(pg.sprite.Sprite):
         if self.current_life_cd <= 0:
             self.kill()
 
-        collided_walls = pg.sprite.spritecollide(self, self.walls, False)
-        for wall in collided_walls:
-            if self.rect.centerx < wall.rect.left:
-                self.direction.x *= -1
-                self.rect.right = wall.rect.left
-                self.bounces += 1
-                if self.bounces == self.max_bounces:
-                    return self.kill()
-                break
-            if self.rect.centerx > wall.rect.right:
-                self.direction.x *= -1
-                self.rect.left = wall.rect.right
-                self.bounces += 1
-                if self.bounces == self.max_bounces:
-                    return self.kill()
-                break
-            if self.rect.centery < wall.rect.top:
+        for collided_wall in pg.sprite.spritecollide(self, self.walls, False):
+            overlap_top = abs(self.rect.bottom - collided_wall.rect.top)
+            overlap_bottom = abs(self.rect.top - collided_wall.rect.bottom)
+            overlap_left = abs(self.rect.right - collided_wall.rect.left)
+            overlap_right = abs(self.rect.left - collided_wall.rect.right)
+
+            smallest_overlap = min(overlap_top, overlap_bottom, overlap_left, overlap_right)
+
+            if smallest_overlap == overlap_top:
                 self.direction.y *= -1
-                self.rect.bottom = wall.rect.top
-                self.bounces += 1
-                if self.bounces == self.max_bounces:
-                    return self.kill()
-                break
-            if self.rect.centery > wall.rect.bottom:
+                self.rect.bottom = collided_wall.rect.top
+            elif smallest_overlap == overlap_bottom:
                 self.direction.y *= -1
-                self.rect.top = wall.rect.bottom
-                self.bounces += 1
-                if self.bounces == self.max_bounces:
-                    return self.kill()
-                break
-                
+                self.rect.top = collided_wall.rect.bottom
+            elif smallest_overlap == overlap_left:
+                self.direction.x *= -1
+                self.rect.right = collided_wall.rect.left
+            elif smallest_overlap == overlap_right:
+                self.direction.x *= -1
+                self.rect.left = collided_wall.rect.right
+
+            if self.bounces == self.max_bounces:
+                return self.kill()
+            self.bounces += 1
