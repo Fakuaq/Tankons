@@ -1,6 +1,7 @@
 from powerups.shot_powerup import ShotPowerup
 import pygame as pg
 from shot import Shot
+from sound_controller import SoundController
 
 class RapidShot(ShotPowerup):
     cooldown = 60
@@ -15,6 +16,7 @@ class RapidShot(ShotPowerup):
     def shoot(self):
         if not self.shot:
             self.shot = True
+            SoundController.powerup_bigshot_sound()
             direction = pg.math.Vector2(0, 1).rotate(-self.player.angle + 180)
             Shot(self.player, self.player.get_turret_position(), direction, self.bounces, self.radius, self.speed, self.player.walls, self.player.shots, self.player.groups)
             

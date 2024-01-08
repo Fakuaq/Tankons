@@ -1,6 +1,7 @@
 from powerups.shot_powerup import ShotPowerup
 import pygame as pg
 from shot import Shot
+from sound_controller import SoundController
 
 class ArrowShot(ShotPowerup):
     cooldown = 20
@@ -16,7 +17,8 @@ class ArrowShot(ShotPowerup):
         if not self.shot:
             self.angle_positive = self.player.angle
             self.angle_negative = self.player.angle
-            
+
+        SoundController.powerup_arrowshot_sound()
         self.shot = True
         self.angle_positive += 1
         self.angle_negative -= 1
