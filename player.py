@@ -66,9 +66,24 @@ class Player(pg.sprite.Sprite):
                 self.kill_player()
 
         # wall collision
-        if pg.sprite.spritecollideany(self, self.walls):
-            self.position -= direction_vector
-            self.rect.center = int(self.position.x), int(self.position.y)
+        for collided_wall in pg.sprite.spritecollide(self, self.walls, False):
+            overlap_top = abs(self.rect.bottom - collided_wall.rect.top)
+            overlap_bottom = abs(self.rect.top - collided_wall.rect.bottom)
+            overlap_left = abs(self.rect.right - collided_wall.rect.left)
+            overlap_right = abs(self.rect.left - collided_wall.rect.right)
+        
+            smallest_overlap = min(overlap_top, overlap_bottom, overlap_left, overlap_right)
+            
+            if smallest_overlap == overlap_top:
+                self.rect.bottom = collided_wall.rect.top
+            elif smallest_overlap == overlap_bottom:
+                self.rect.top = collided_wall.rect.bottom
+            elif smallest_overlap == overlap_left:
+                self.rect.right = collided_wall.rect.left
+            elif smallest_overlap == overlap_right:
+                self.rect.left = collided_wall.rect.right
+            
+            self.position.update(self.rect.centerx, self.rect.centery)
 
         # player collision
         if pg.sprite.spritecollide(self, self.players, False):
