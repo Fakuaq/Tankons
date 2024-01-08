@@ -21,6 +21,7 @@ class Wall(pg.sprite.Sprite):
     Example:
     wall = Wall((100, 200), (30, 40), all_sprites, walls_group)
     """
+    
     def __init__(self, pos, size, *groups):
         self.image = pg.Surface(size)
         self.image.fill((0, 0, 0))
