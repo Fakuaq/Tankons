@@ -12,7 +12,7 @@ class RapidShot(ShotPowerup):
         speed (int): The speed of the rapid shots.
         radius (int): The radius of the rapid shots.
         bounces (int): The number of times rapid shots can bounce off walls.
-        shot (bool): Flag indicating whether the rapid shot mode is active.
+        shot (bool): Flag indicating whether the powerup has been used.
 
     Methods:
         __init__(self, player): Initializes the RapidShot powerup for a given player.
