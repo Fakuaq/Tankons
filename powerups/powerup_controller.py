@@ -14,6 +14,7 @@ class PowerupController:
         - players (pygame.sprite.Group): Sprite group for players.
         - groups (tuple): Additional sprite groups to which powerups should belong.
         - walls (pygame.sprite.Group): Sprite group for walls.
+        - powerup_options (list): defines possible powerup classes and sprites for each powerup.
 
     Methods:
         - spawn_powerup(self, coords):

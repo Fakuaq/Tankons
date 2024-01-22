@@ -9,8 +9,8 @@ class ArrowShot(ShotPowerup):
 
     Attributes:
         - cooldown (int): The cooldown time between shots.
-        - speed (int): The speed of the arrows.
-        - shot (bool): Flag to indicate if the powerup is currently active.
+        - speed (int): The speed of the shots.
+        - shot (bool): Flag to indicate that the powerup has been used.
 
     Methods:
         - __init__(self, player): Initializes the ArrowShot powerup for a specific player.
@@ -34,7 +34,7 @@ class ArrowShot(ShotPowerup):
         
     def shoot(self):
         """
-        Overrides the shoot method to allow shooting arrows in a wider angle.
+        Overrides the shoot method to allow shooting shots in a wider angle.
 
         Parameters:
             None
