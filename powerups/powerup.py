@@ -3,7 +3,6 @@ from powerups.stats_powerup import StatsPowerup
 from powerups.shot_powerup import ShotPowerup
 from typing import Type
 from sound_controller import SoundController
-from observers.game_event_observable import GameEventObservable
 
 class Powerup(pg.sprite.Sprite):
     """
@@ -41,7 +40,6 @@ class Powerup(pg.sprite.Sprite):
             - walls (pygame.sprite.Group): The group of wall sprites in the game.
             - *groups: Additional sprite groups to which the powerup should belong.
         """
-        super().__init__(powerup_sprites, *groups)
         self.powerup = powerup
         self.players = players
         self.powerup_sprites = powerup_sprites
@@ -49,6 +47,8 @@ class Powerup(pg.sprite.Sprite):
 
         self.image = pg.image.load(self.base_path + sprite_path).convert_alpha()
         self.rect = self.image.get_rect(center=coords)
+
+        super().__init__(powerup_sprites, *groups)
         
     def update(self):
         """

@@ -49,7 +49,6 @@ class Client(Observer):
             case GameEvent.COORDS.value:
                 self._gc.set_player_coords(value)
             case GameEvent.SHOT.value:
-                print(value)
                 self._gc.player_shoot(value)
             case GameEvent.POWERUP.value:
                 (powerup_class_name, coords) = value
