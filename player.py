@@ -3,49 +3,9 @@ from particle import Particle
 from sound_controller import SoundController
 import pygame as pg
 import math
+from observers.game_event_observable import GameEventObservable
 
 class Player(pg.sprite.Sprite):
-    """
-    A class representing a player-controlled tank in the game.
-
-    Attributes:
-        - speed (int): The movement speed of the player.
-        - rotation_speed (int): The rotation speed of the player.
-        - shot_bounces (int): The maximum number of bounces for shots fired by the player.
-        - shot_radius (float): The radius of the shots fired by the player.
-        - shot_speed (int): The speed of the shots fired by the player.
-        - shot_cd (int): The cooldown time between consecutive shots.
-        - curr_shot_cd (int): The current remaining cooldown time for shooting.
-        - angle (float): The rotation angle of the player's tank.
-        - stats_powerups (list): A list of active powerups affecting the player's stats.
-        - weapon_powerup (Powerup): The active powerup affecting the player's weapon, if any.
-
-    Methods:
-        - __init__(self, identity, score, controls, pos, shots, walls, players, *groups):
-            Initializes the Player object with the specified parameters.
-
-        - update(self):
-            Updates the position and behavior of the player based on user input and game interactions.
-
-        - kill_player(self):
-            Handles the player's death by creating particles, playing sound, and removing the player from the game.
-
-        - get_sprite_color(self):
-            Retrieves the color of the player's tank sprite at the center.
-
-        - get_turret_position(self):
-            Calculates and returns the position of the player's turret based on the tank's rotation.
-
-        - shoot(self):
-            Fires a shot from the player's tank, creating a new Shot object.
-
-        - add_stats_powerup(self, powerup):
-            Adds a stat-affecting powerup to the player's active powerups.
-
-        - remove_stats_powerup(self, powerup):
-            Removes a stat-affecting powerup from the player's active powerups.
-    """
-    
     speed = 3
     rotation_speed = 3
     shot_bounces = 3
@@ -57,7 +17,7 @@ class Player(pg.sprite.Sprite):
     stats_powerups = []
     weapon_powerup = None
 
-    def __init__(self, identity, score, controls, pos, shots, walls, players, *groups):
+    def __init__(self, identity, score, controls, pos, shots, walls, players, player_controlling, *groups):
         """
         Initializes a Player object with the specified parameters.
 
@@ -97,6 +57,7 @@ class Player(pg.sprite.Sprite):
         self.player_color = self.get_sprite_color()
         self.players = players
         self.groups = groups
+        self.player_controlling = player_controlling
 
         pg.sprite.Sprite.__init__(self, self.players, *self.groups)
 
@@ -104,26 +65,29 @@ class Player(pg.sprite.Sprite):
         keys = pg.key.get_pressed()
 
         # movement update
-        direction = int(keys[self.controls['down']] - keys[self.controls['up']])
-        direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
-        self.position += direction_vector
         self.rect.center = int(self.position.x), int(self.position.y)
-
-        # rotate sprite
-        rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
-        rotation = rotation if direction != 1 else rotation * -1 # flip rotation if moving backwards
-        if rotation:
-            self.angle = self.angle % 360 + rotation * self.rotation_speed
-            self.image = pg.transform.rotate(self.image_copy, self.angle)
-            self.rect = self.image.get_rect(center=self.rect.center)
+        self.image = pg.transform.rotate(self.image_copy, self.angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
+        
+        if self.player_controlling:
+            direction = int(keys[self.controls['down']] - keys[self.controls['up']])
+            direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
+            self.position += direction_vector
+    
+            # rotate sprite
+            rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
+            rotation = rotation if direction != 1 else rotation * -1 # flip rotation if moving backwards
+            if rotation:
+                self.angle = self.angle % 360 + rotation * self.rotation_speed
+                self.rect = self.image.get_rect(center=self.rect.center)
 
         # shoot update
         self.curr_shot_cd -= 1
-        if keys[self.controls['shoot']]:
-            if self.weapon_powerup:
-                self.weapon_powerup.shoot()
-            else:
+        if keys[self.controls['shoot']] and self.player_controlling:
+            if self.curr_shot_cd <= 0:
                 self.shoot()
+                self.curr_shot_cd = self.shot_cd
+                GameEventObservable().set_game_event(('shot', self.identity))
 
         # shot collision        
         if pg.sprite.spritecollideany(self, self.shots):
@@ -154,7 +118,7 @@ class Player(pg.sprite.Sprite):
             self.position.update(self.rect.centerx, self.rect.centery)
 
         # player collision
-        if pg.sprite.spritecollide(self, self.players, False):
+        if pg.sprite.spritecollide(self, self.players, False) and self.player_controlling:
             players = pg.sprite.spritecollide(self, self.players, False)
             for player in players:
                 if player is not self:
@@ -224,17 +188,23 @@ class Player(pg.sprite.Sprite):
         Returns:
             None
         """
-        if self.curr_shot_cd > 0: return
-
-        self.curr_shot_cd = self.shot_cd
-        turret_position = self.get_turret_position()
-       
-        direction = pg.math.Vector2(0, 1).rotate(-self.angle + 180)
-        Shot(self, turret_position, direction, self.shot_bounces, self.shot_radius, self.shot_speed, self.walls, self.shots, *self.groups)
-        SoundController.shoot_sound()
+        if self.weapon_powerup:
+            self.weapon_powerup.shoot()
+        else:
+            turret_position = self.get_turret_position()
+           
+            direction = pg.math.Vector2(0, 1).rotate(-self.angle + 180)
+            Shot(self, turret_position, direction, self.shot_bounces, self.shot_radius, self.shot_speed, self.walls, self.shots, *self.groups)
+            SoundController.shoot_sound()
 
     def add_stats_powerup(self, powerup):
         self.stats_powerups.append(powerup)
         
     def remove_stats_powerup(self, powerup):
         self.stats_powerups.remove(powerup)
+
+    def add_weapon_powerup(self, powerup):
+        self.weapon_powerup = powerup
+        
+    def remove_weapon_powerup(self):
+        self.weapon_powerup = None

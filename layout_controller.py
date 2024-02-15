@@ -36,6 +36,7 @@ class LayoutController:
     walls = []
     spawns = []
     powerup_zones = []
+    _current_layout = None
     
     def __init__(self, screen, *groups):
         """
@@ -51,7 +52,10 @@ class LayoutController:
         self.screen = screen
         self.groups = groups
 
-    def generate_layout(self):
+    def pick_layout(self) -> int:
+        return randint(0, len(layouts) - 1)
+
+    def render_layout(self, layout_index: int) -> None:
         """
         Generates a random layout for the game.
 
@@ -63,8 +67,7 @@ class LayoutController:
         """
         self.spawns = []
         self.powerup_zones = []
-        
-        layout_index = randint(0, len(layouts) - 1)
+        self._current_layout = layout_index
         layout = layouts[layout_index]
 
         for i in range(len(layout['wall_positions'])):
@@ -75,6 +78,9 @@ class LayoutController:
 
         for i in range(len(layout['powerup_zones'])):
             self.powerup_zones.append(pg.Rect(layout['powerup_zones'][i]))
+        
+    def current_layout(self):
+        return self._current_layout
 
     def spawn_coordinates(self, player_count):
         """
@@ -89,11 +95,11 @@ class LayoutController:
             ValueError: If player_count is greater than the number of available spawn positions.
             RuntimeError: If the layout is uninitialized.
         """
-        if player_count > len(self.spawns):
-            raise ValueError('Player count can\'t be bigger than the spawn position count')
-
         if not self.walls:
             raise RuntimeError('Can\'t call method with uninitialized layout')
+        
+        if player_count > len(self.spawns):
+            raise ValueError('Player count can\'t be bigger than the spawn position count')
 
         coords = []
         picked_indexes = [] 

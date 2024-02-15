@@ -57,7 +57,7 @@ class PlayerController:
         self.all_sprites = all_sprites
         self.player_images = []
         
-    def spawn_players(self, count, coords):
+    def spawn_players(self, count, coords, identity, same_controls):
         """
         Spawns as much players at the specified coordinates as the count indicates.
 
@@ -68,11 +68,17 @@ class PlayerController:
         Returns:
             None
         """
-        if count > len(controls):
-            raise RuntimeError('Can\'t create more players than there are controls for')
-            
+        player_controls = controls[0]
+
         for i in range(count):
-            player = Player(i + 1, self.scores[i + 1], controls[i], coords[i], self.shots, self.walls, self.players, self.all_sprites)
+            player_controlling = False
+            if i + 1 == identity:
+                player_controlling = True
+            
+            if not same_controls:
+                player_controls = controls[i]
+
+            player = Player(i + 1, self.scores[i + 1], player_controls, coords[i], self.shots, self.walls, self.players, player_controlling, self.all_sprites)
             self.player_colors[player.identity] = player.get_sprite_color()
             self.player_images.append(player.image_copy)
 
@@ -126,3 +132,53 @@ class PlayerController:
                 score_x = x_position + score_x_offset
                 score_y = y_axis - score_text.get_height() / 2
                 self.screen.blit(score_text, (score_x, score_y))
+                
+    def players_coords(self) -> dict:
+        coords = {}
+        
+        for player in self.players:
+            coords[player.identity] = int(player.position.x), int(player.position.y), player.angle
+            
+        return coords
+
+    def player_coords(self, identity: int) -> tuple|None:
+        player = self._player_from_identity(identity)
+        if not player:
+            return None
+        
+        return int(player.position.x), int(player.position.y), player.angle
+
+    def set_player_coords(self, movement: dict) -> None:
+        for player in self.players:
+            if player.identity in movement:
+                (x, y, rotation) = movement[player.identity]
+                player.position.x, player.position.y = x, y
+                player.angle = rotation
+                
+    def player_shot(self, identity):
+        player = self._player_from_identity(identity)
+        return player.shot
+            
+    def player_shoot(self, identity):
+        player = self._player_from_identity(identity)
+        player.shoot()
+
+    def add_stat_powerup(self, identity, powerup_name):
+        player = self._player_from_identity(identity)
+        powerup = globals()[powerup_name](player)
+        
+        player.add_stats_powerup(powerup)
+        
+    def add_shot_powerup(self, identity, powerup):
+        player = self._player_from_identity(identity)
+        player.add_weapon_powerup(powerup)
+        
+    def update_scoreboard(self, identity):
+        if identity != 0:
+            self.scores[identity] += 1
+    
+    def _player_from_identity(self, identity):
+        for player in self.players:
+            if player.identity == identity:
+                return player
+        

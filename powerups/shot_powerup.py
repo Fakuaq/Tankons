@@ -38,4 +38,4 @@ class ShotPowerup(ABC):
                 self.remove()
 
     def remove(self):
-        self.player.weapon_powerup = None
+        self.player.remove_weapon_powerup()

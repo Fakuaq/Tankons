@@ -3,6 +3,7 @@ from powerups.stats_powerup import StatsPowerup
 from powerups.shot_powerup import ShotPowerup
 from typing import Type
 from sound_controller import SoundController
+from observers.game_event_observable import GameEventObservable
 
 class Powerup(pg.sprite.Sprite):
     """
@@ -70,5 +71,5 @@ class Powerup(pg.sprite.Sprite):
                 if powerup.powerup_type == 'stats':
                     player.add_stats_powerup(powerup)
                 elif powerup.powerup_type == 'shot':
-                    player.weapon_powerup = powerup
+                     player.add_weapon_powerup(powerup)
         

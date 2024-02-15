@@ -64,4 +64,14 @@ class PowerupController:
         powerup_index = randint(0, len(self.powerup_options) - 1)
         powerup = self.powerup_options[powerup_index]
         
-        Powerup(powerup['class'], powerup['path'], coords, self.players, self.powerups, self.walls, *self.groups)
+        powerup_sprite = Powerup(powerup['class'], powerup['path'], coords, self.players, self.powerups, self.walls, *self.groups)
+        return powerup_sprite, powerup['class']
+        
+    def instantiate_powerup(self, powerup_type, coords):
+        path = ''
+        for powerup in self.powerup_options:
+            if powerup['class'] == powerup_type:
+                path = powerup['path']
+        
+        Powerup(powerup_type, path, coords, self.players, self.powerups, self.walls, *self.groups)
+        
