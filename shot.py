@@ -1,5 +1,6 @@
 import pygame as pg
 
+
 class Shot(pg.sprite.Sprite):
     life_cd = 60 * 3
     current_life_cd = life_cd
@@ -17,7 +18,7 @@ class Shot(pg.sprite.Sprite):
         pg.draw.circle(self.image, "black", (self.radius, self.radius), self.radius)
         self.rect = self.image.get_rect(center=position)
         self.position = pg.math.Vector2((self.rect.centerx, self.rect.centery))
-        
+
         pg.sprite.Sprite.__init__(self, *groups)
 
     def update(self):

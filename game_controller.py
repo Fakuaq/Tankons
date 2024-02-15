@@ -57,9 +57,6 @@ class GameController:
     def update(self):        
         if not self.session_started: return
         
-        if self.client:
-            self.transmit_player_coords()
-        
         self.screen.fill('white')
         self.all_sprites.draw(self.screen)
         self.all_sprites.update()
@@ -71,6 +68,7 @@ class GameController:
         if self.curr_powerup_stat_cd < 0 and self.server:
             self.curr_powerup_stat_cd = self.powerup_stat_cd
             coords = self.layout_controller.powerup_coordinates(self.powerups)
+
             if coords:
                 powerup, powerup_class = self.powerup_controller.spawn_powerup(coords)
                 self.server.broadcast(GameEvent.POWERUP, (powerup_class.__name__, powerup.rect.center))
@@ -93,9 +91,9 @@ class GameController:
             self.game_resetting = True
             self.game_reset_time = self.game_reset_cd
             if last_player != 0:
-                GameEventObservable().set_game_event(('reset_round', last_player.identity))
+                GameEventObservable().set_game_event((GameEvent.RESET_ROUND, last_player.identity))
             else:
-                GameEventObservable().set_game_event(('reset_round', last_player))
+                GameEventObservable().set_game_event((GameEvent.RESET_ROUND, last_player))
         if isinstance(last_player, Player):
             self.scores[last_player.identity] += 1
 
@@ -104,7 +102,7 @@ class GameController:
             sprite.kill()
 
         if self.server:
-            GameEventObservable().set_game_event(('start_round', None))
+            GameEventObservable().set_game_event((GameEvent.START_ROUND, None))
 
     def spawn_powerup(self, powerup_class_name, coords):
         _class = globals()[powerup_class_name]
@@ -147,3 +145,7 @@ class GameController:
     def update_scoreboard(self, identity):
         if identity != 0:
             self.player_controller.update_scoreboard(identity)
+
+    def set_movement(self, identity, value):
+        direction, rotation = value
+        self.player_controller.set_movement(identity, direction, rotation)

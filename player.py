@@ -4,10 +4,10 @@ from sound_controller import SoundController
 import pygame as pg
 import math
 from observers.game_event_observable import GameEventObservable
+from enums.game_event import GameEvent
 
 
 class Player(pg.sprite.Sprite):
-    base_path = 'assets/players/'
     speed = 3
     rotation_speed = 3
     shot_bounces = 3
@@ -18,6 +18,11 @@ class Player(pg.sprite.Sprite):
     angle = 0
     stats_powerups = []
     weapon_powerup = None
+    last_inputs = None
+    rotation = 0
+    direction = 0
+    base_path = 'assets/players/'
+
 
     def __init__(self, identity, score, controls, pos, shots, walls, players, player_controlling, *groups):
         self.score = score
@@ -45,16 +50,22 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
         if self.player_controlling:
-            direction = int(keys[self.controls['down']] - keys[self.controls['up']])
-            direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
-            self.position += direction_vector
+            self.direction = int(keys[self.controls['down']] - keys[self.controls['up']])
+            self.rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
 
-            # rotate sprite
-            rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
-            rotation = rotation if direction != 1 else rotation * -1 # flip rotation if moving backwards
-            if rotation:
-                self.angle = self.angle % 360 + rotation * self.rotation_speed
-                self.rect = self.image.get_rect(center=self.rect.center)
+            if self.last_inputs != (self.direction, self.rotation):
+                GameEventObservable().set_game_event((GameEvent.COORDS, (self.direction, self.rotation)))
+            self.last_inputs = (self.direction, self.rotation)
+
+        # update position
+        direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * self.direction * self.speed
+        self.position += direction_vector
+
+        # rotate sprite
+        rotation = self.rotation if self.direction != 1 else self.rotation * -1  # flip rotation if moving backwards
+        if rotation:
+            self.angle = self.angle % 360 + rotation * self.rotation_speed
+            self.rect = self.image.get_rect(center=self.rect.center)
 
         # shoot update
         self.curr_shot_cd -= 1
@@ -62,7 +73,7 @@ class Player(pg.sprite.Sprite):
             if self.curr_shot_cd <= 0:
                 self.shoot()
                 self.curr_shot_cd = self.shot_cd
-                GameEventObservable().set_game_event(('shot', self.identity))
+                GameEventObservable().set_game_event((GameEvent.SHOT, self.identity))
 
         # shot collision        
         if pg.sprite.spritecollideany(self, self.shots):

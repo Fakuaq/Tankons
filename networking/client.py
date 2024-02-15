@@ -47,7 +47,8 @@ class Client(Observer):
             case GameEvent.RESET_ROUND.value:
                 self._gc.update_scoreboard(value)
             case GameEvent.COORDS.value:
-                self._gc.set_player_coords(value)
+                (identity, movement) = value
+                self._gc.set_movement(identity, movement)
             case GameEvent.SHOT.value:
                 self._gc.player_shoot(value)
             case GameEvent.POWERUP.value:
@@ -55,11 +56,14 @@ class Client(Observer):
                 self._gc.spawn_powerup(powerup_class_name, coords)
 
     def update(self, observable: GameEventObservable):
+        event_type: GameEvent
         (event_type, event_value) = observable.game_event()
 
-        match event_type:
+        match event_type.value:
             case GameEvent.SHOT.value:
                 self.transmit(GameEvent.SHOT)
+            case GameEvent.COORDS.value:
+                self.transmit(GameEvent.COORDS, event_value)
 
     def __del__(self):
         self._s.close()

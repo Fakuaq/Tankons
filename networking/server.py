@@ -23,6 +23,7 @@ class Server(Observer):
         GameEventObservable().attach(self)
         self._gc = game_controller
         self._s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._s.bind((HOST, PORT))
         self._s.listen(MAX_CLIENT_COUNT)
         print(f'Listening on port: {PORT}, max clients: {MAX_CLIENT_COUNT}')
@@ -53,15 +54,11 @@ class Server(Observer):
 
             message_type: GameEvent
             (message_type, value) = data
-
-            response = self.handle_response(message_type, value, addr, conn)
-
-            if response:
-                conn.send(pickle.dumps((response[0].value, response[1])))
+            self.handle_response(message_type, value, addr, conn)
 
         conn.close()
 
-    def handle_response(self, message_type: GameEvent, value, addr, conn) -> tuple:
+    def handle_response(self, message_type: GameEvent, value, addr, conn):
         player_index = None
         for k, v in self._client_addresses.items():
             if v == addr:
@@ -86,25 +83,17 @@ class Server(Observer):
                     self.broadcast(GameEvent.START_ROUND, (self._current_layout, coords))
                     self._gc.session_started = True
 
-
                     for i, coord in enumerate(coords):
                         self._player_coords[i + 1] = coord[0], coord[1], 0
 
             case GameEvent.COORDS.value:
-                self._player_coords[player_index] = value
-                self._gc.set_player_coords({player_index: value})
-
-                response = {}
-                for k, v in self._player_coords.items():
-                    if k != player_index:
-                        response[k] = v
-
-                return GameEvent.COORDS, response
+                self._gc.set_movement(player_index, value)
+                self.broadcast(GameEvent.COORDS, (player_index, value))
 
             case GameEvent.SHOT.value:
                 self._gc.player_shoot(player_index)
                 self.broadcast_except(addr, GameEvent.SHOT, player_index)
-            
+
     def broadcast(self, message_type: GameEvent, value=None):
         for conn in self._client_connections.values():
             conn.send(pickle.dumps((message_type.value, value)))
