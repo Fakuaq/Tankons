@@ -3,52 +3,12 @@ from player import Player
 import pygame as pg
 pg.font.init()
 
+
 class PlayerController:
-    """
-    A class for managing and controlling player functionality, including spawning, scoring, and scoreboard display.
-
-    Attributes:
-        - player_colors (dict): A dictionary mapping player identities to their respective tank colors.
-        - font (pygame.font.Font): The font object for rendering text.
-        - screen (pygame.Surface): The game screen surface.
-        - scores (dict): A dictionary mapping player identities to their scores.
-        - walls (pygame.sprite.Group): The group of wall sprites.
-        - shots (pygame.sprite.Group): The group of shot sprites.
-        - players (pygame.sprite.Group): The group of player sprites.
-        - all_sprites (pygame.sprite.Group): The group of all sprites.
-        - player_images (list): A list containing images of player tanks.
-        
-    Methods:
-        - __init__(self, screen, scores, walls, shots, players, all_sprites):
-            Initializes the PlayerController with the specified parameters.
-
-        - spawn_players(self, count, coords):
-            Spawns player objects with the specified count and initial coordinates.
-
-        - last_player_standing(self):
-            Checks if only one player is left in the game.
-
-        - draw_scoreboard(self):
-            Draws the player scoreboard on the screen.
-    """
     player_colors = {}
     font = pg.font.SysFont("San Francisco", 60)
     
     def __init__(self, screen, scores, walls, shots, players, all_sprites):
-        """
-        Initializes the PlayerController object with the specified parameters.
-
-        Parameters:
-            - screen: The pygame screen on which the game is displayed.
-            - scores (dict): A dictionary to store player scores.
-            - walls (Group): The group containing Wall objects in the game.
-            - shots (Group): The group containing Shot objects in the game.
-            - players (Group): The group containing Player objects in the game.
-            - all_sprites (Group): The group containing all sprites in the game.
-
-        Returns:
-            None
-        """
         self.screen = screen
         self.scores = scores
         self.walls = walls
@@ -58,16 +18,6 @@ class PlayerController:
         self.player_images = []
         
     def spawn_players(self, count, coords, identity, same_controls):
-        """
-        Spawns as much players at the specified coordinates as the count indicates.
-
-        Parameters:
-            - count (int): The number of players to spawn.
-            - coords (list): A list of tuples containing initial coordinates for each player.
-
-        Returns:
-            None
-        """
         player_controls = controls[0]
 
         for i in range(count):
@@ -83,15 +33,6 @@ class PlayerController:
             self.player_images.append(player.image_copy)
 
     def last_player_standing(self):
-        """
-        Checks if only one player is left in the game.
-
-        Parameters:
-            None
-
-        Returns:
-            int or None: If one player is left, returns the identity of that player. Otherwise, returns None.
-        """
         if len(self.players) == 0: # if all players killed at the same frame
             return 0
         if len(self.players) == 1:
@@ -100,15 +41,6 @@ class PlayerController:
         return None
 
     def draw_scoreboard(self):
-        """
-        Draws the player scoreboard on the screen.
-
-        Parameters:
-            None
-
-        Returns:
-            None
-        """
         if self.player_images:
             score_x_offset = 50
             tank_y_offset = 7
@@ -116,7 +48,7 @@ class PlayerController:
             margins = 100
             y_axis = 50
             x_axis = self.screen.get_width() / 2 - scoreboard_x_offset
-            score_color = (0,0,0)
+            score_color = (0, 0, 0)
             
             # Draw each scoreboard element
             for i, (player_identity, score) in enumerate(self.scores.items()):
@@ -161,7 +93,9 @@ class PlayerController:
             
     def player_shoot(self, identity):
         player = self._player_from_identity(identity)
-        player.shoot()
+
+        if player:
+            player.shoot()
 
     def add_stat_powerup(self, identity, powerup_name):
         player = self._player_from_identity(identity)

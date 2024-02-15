@@ -5,7 +5,9 @@ import pygame as pg
 import math
 from observers.game_event_observable import GameEventObservable
 
+
 class Player(pg.sprite.Sprite):
+    base_path = 'assets/players/'
     speed = 3
     rotation_speed = 3
     shot_bounces = 3
@@ -18,36 +20,9 @@ class Player(pg.sprite.Sprite):
     weapon_powerup = None
 
     def __init__(self, identity, score, controls, pos, shots, walls, players, player_controlling, *groups):
-        """
-        Initializes a Player object with the specified parameters.
-
-        Parameters:
-            - identity (str): A unique identifier for the player.
-            - score (int): The initial score of the player.
-            - controls (dict): A dictionary mapping control actions to keycodes for the player.
-            - pos (tuple): The initial position of the player's tank (x, y).
-            - shots (Group): The group containing all shots in the game.
-            - walls (Group): The group containing all walls in the game.
-            - players (Group): The group containing all players in the game.
-            - *groups: Additional sprite groups to which the player should belong.
-
-        Attributes:
-            - score (int): The current score of the player.
-            - identity (str): The unique identifier for the player.
-            - image (Surface): The image of the player's tank loaded from a file.
-            - image_copy (Surface): A copy of the player's tank image.
-            - controls (dict): The dictionary mapping control actions to keycodes for the player.
-            - rect (Rect): The rectangular area occupied by the player's tank.
-            - position (Vector2): The 2D vector representing the position of the player's tank.
-            - shots (Group): The group containing all shots in the game.
-            - walls (Group): The group containing all walls in the game.
-            - player_color (Color): The color of the player's tank sprite at the center.
-            - players (Group): The group containing all players in the game.
-            - groups (tuple): A tuple containing additional sprite groups to which the player belongs.
-        """
         self.score = score
         self.identity = identity
-        self.image = pg.image.load(f'assets/tank_{identity}.png').convert_alpha()
+        self.image = pg.image.load(f'{self.base_path}tank_{identity}.png').convert_alpha()
         self.image_copy = self.image
         self.controls = controls
         self.rect = self.image.get_rect(center=pos)
@@ -68,12 +43,12 @@ class Player(pg.sprite.Sprite):
         self.rect.center = int(self.position.x), int(self.position.y)
         self.image = pg.transform.rotate(self.image_copy, self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)
-        
+
         if self.player_controlling:
             direction = int(keys[self.controls['down']] - keys[self.controls['up']])
             direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
             self.position += direction_vector
-    
+
             # rotate sprite
             rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
             rotation = rotation if direction != 1 else rotation * -1 # flip rotation if moving backwards
@@ -92,7 +67,7 @@ class Player(pg.sprite.Sprite):
         # shot collision        
         if pg.sprite.spritecollideany(self, self.shots):
             shot = pg.sprite.spritecollideany(self, self.shots)
-            
+
             if shot.shot_by is not self or (shot.bounces != 0 and shot.shot_by is self):
                 shot.kill()
                 self.kill_player()
@@ -103,9 +78,9 @@ class Player(pg.sprite.Sprite):
             overlap_bottom = abs(self.rect.top - collided_wall.rect.bottom)
             overlap_left = abs(self.rect.right - collided_wall.rect.left)
             overlap_right = abs(self.rect.left - collided_wall.rect.right)
-        
+
             smallest_overlap = min(overlap_top, overlap_bottom, overlap_left, overlap_right)
-            
+
             if smallest_overlap == overlap_top:
                 self.rect.bottom = collided_wall.rect.top
             elif smallest_overlap == overlap_bottom:
@@ -114,7 +89,7 @@ class Player(pg.sprite.Sprite):
                 self.rect.right = collided_wall.rect.left
             elif smallest_overlap == overlap_right:
                 self.rect.left = collided_wall.rect.right
-            
+
             self.position.update(self.rect.centerx, self.rect.centery)
 
         # player collision
@@ -124,7 +99,7 @@ class Player(pg.sprite.Sprite):
                 if player is not self:
                     self.position -= 1.1 * direction_vector
                     self.rect.center = int(self.position.x), int(self.position.y)
-                
+
         # powerup update
         for powerup in self.stats_powerups.copy():
             powerup.update()
@@ -132,15 +107,6 @@ class Player(pg.sprite.Sprite):
             self.weapon_powerup.update()
 
     def kill_player(self):
-        """
-        Initiates the player's death sequence, creating particles and playing a death sound.
-
-        Parameters:
-            None
-
-        Returns:
-            None
-        """
         particle_count = 50
         particle_speed = 5
         particle_color = self.player_color
@@ -148,63 +114,36 @@ class Player(pg.sprite.Sprite):
 
         for _ in range(particle_count):
             Particle(self.rect.centerx, self.rect.centery, particle_color, particle_speed, *self.groups)
-            
+
         self.kill()
-        
+
     def get_sprite_color(self):
-        """
-        Gets the color of the player's tank sprite at the center.
-
-        Parameters:
-            None
-
-        Returns:
-            Color: The color at the center of the player's tank sprite.
-        """
         return self.image.get_at((int(self.rect.width / 2 + 5), int(self.rect.height / 2)))
-    
+
     def get_turret_position(self):
-        """
-        Calculates the position of the turret relative to the player's tank.
-
-        Parameters:
-            None
-
-        Returns:
-            tuple: The (x, y) coordinates of the turret position.
-        """
         x_turret = self.rect.centerx - (self.rect.height / 2) * math.sin(math.radians(self.angle))
         y_turret = self.rect.centery - (self.rect.height / 2) * math.cos(math.radians(self.angle))
 
         return int(x_turret), int(y_turret)
-    
+
     def shoot(self):
-        """
-        Initiates the shooting mechanism of the player, creating a shot and playing a shooting sound.
-
-        Parameters:
-            None
-
-        Returns:
-            None
-        """
         if self.weapon_powerup:
             self.weapon_powerup.shoot()
         else:
             turret_position = self.get_turret_position()
-           
+
             direction = pg.math.Vector2(0, 1).rotate(-self.angle + 180)
             Shot(self, turret_position, direction, self.shot_bounces, self.shot_radius, self.shot_speed, self.walls, self.shots, *self.groups)
             SoundController.shoot_sound()
 
     def add_stats_powerup(self, powerup):
         self.stats_powerups.append(powerup)
-        
+
     def remove_stats_powerup(self, powerup):
         self.stats_powerups.remove(powerup)
 
     def add_weapon_powerup(self, powerup):
         self.weapon_powerup = powerup
-        
+
     def remove_weapon_powerup(self):
         self.weapon_powerup = None
