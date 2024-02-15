@@ -71,5 +71,5 @@ class Powerup(pg.sprite.Sprite):
                 if powerup.powerup_type == 'stats':
                     player.add_stats_powerup(powerup)
                 elif powerup.powerup_type == 'shot':
-                     player.add_weapon_powerup(powerup)
+                    player.add_weapon_powerup(powerup)
         
