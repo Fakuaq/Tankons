@@ -22,11 +22,14 @@ class Client(Observer):
 
     def listen(self):
         while True:
-            data, _ = self._s.recvfrom(1024)
-            data = pickle.loads(data)
-            (message_type, value) = data
+            try:
+                data, _ = self._s.recvfrom(1024)
+                data = pickle.loads(data)
+                (message_type, value) = data
 
-            self.handle_response(message_type, value)
+                self.handle_response(message_type, value)
+            except OSError as e:
+                print(e)
 
     def transmit(self, message_type: GameEvent, value=None):
         self._s.sendto(pickle.dumps((message_type.value, value)), ADDRESS)
