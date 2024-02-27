@@ -54,7 +54,11 @@ class Server(Observer):
 
             message_type: GameEvent
             (message_type, value) = data
-            self.handle_response(message_type, value, addr, conn)
+
+            response = self.handle_response(message_type, value, addr, conn)
+
+            if response:
+                conn.send(pickle.dumps((response[0].value, response[1])))
 
         conn.close()
 
@@ -87,8 +91,10 @@ class Server(Observer):
                         self._player_coords[i + 1] = coord[0], coord[1], 0
 
             case GameEvent.COORDS.value:
-                self._gc.set_movement(player_index, value)
-                self.broadcast(GameEvent.COORDS, (player_index, value))
+                self._player_coords[player_index] = value
+                self._gc.set_player_coords({player_index: value})
+
+                return GameEvent.COORDS, self._player_coords
 
             case GameEvent.SHOT.value:
                 self._gc.player_shoot(player_index)
@@ -106,7 +112,7 @@ class Server(Observer):
     def update(self, observable: GameEventObservable):
         (event_type, event_value) = observable.game_event()
 
-        match event_type:
+        match event_type.value:
             case GameEvent.START_ROUND.value:
                 self._current_layout = self._gc.pick_layout()
                 self._gc.render_layout(self._current_layout)

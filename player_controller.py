@@ -111,13 +111,6 @@ class PlayerController:
         if identity != 0:
             self.scores[identity] += 1
 
-    def set_movement(self, identity, direction, rotation):
-        player = self._player_from_identity(identity)
-        print(player, direction, rotation)
-
-        player.direction = direction
-        player.rotation = rotation
-
     def _player_from_identity(self, identity):
         for player in self.players:
             if player.identity == identity:

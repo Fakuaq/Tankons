@@ -27,7 +27,7 @@ class GameController:
     game_reset_time = game_reset_cd
     powerup_stat_cd = 60 * 5
     curr_powerup_stat_cd = powerup_stat_cd
-    
+
     def __init__(self, screen):
         self.screen = screen
         self.scores = {}
@@ -42,9 +42,10 @@ class GameController:
         self.powerups = pg.sprite.Group()
 
         self.layout_controller = LayoutController(self.screen, self.walls, self.all_sprites)
-        self.player_controller = PlayerController(self.screen, self.scores, self.walls, self.shots, self.players, self.all_sprites)
+        self.player_controller = PlayerController(self.screen, self.scores, self.walls, self.shots, self.players,
+                                                  self.all_sprites)
         self.powerup_controller = PowerupController(self.powerups, self.players, self.walls, self.all_sprites)
-        
+
         if sys.argv[1] == 'client':
             self.client = Client(self)
             self.client.transmit(GameEvent.JOIN)
@@ -54,14 +55,17 @@ class GameController:
     def start_game(self, coords: List[tuple]):
         self.player_controller.spawn_players(self.player_count, coords, self._identity, True)
 
-    def update(self):        
+    def update(self):
         if not self.session_started: return
-        
+
+        if self.client:
+            self.transmit_player_coords()
+
         self.screen.fill('white')
         self.all_sprites.draw(self.screen)
         self.all_sprites.update()
         self.player_controller.draw_scoreboard()
-        
+
         self.game_reset_time -= 1
         self.curr_powerup_stat_cd -= 1
 
@@ -75,7 +79,7 @@ class GameController:
 
         if not self.game_resetting and self.server:
             self.check_winner()
-    
+
         if self.game_resetting and self.game_reset_time < 0:
             self.game_resetting = False
             self.reset_game()
@@ -106,25 +110,28 @@ class GameController:
 
     def spawn_powerup(self, powerup_class_name, coords):
         _class = globals()[powerup_class_name]
-        
+
         self.powerup_controller.instantiate_powerup(_class, coords)
 
     def transmit_player_coords(self):
         coords = self.player_controller.player_coords(self._identity)
-        
+
         if coords:
             self.client.transmit(GameEvent.COORDS, coords)
 
     def add_stat_powerup(self, identity, powerup_name):
         self.player_controller.add_stat_powerup(identity, powerup_name)
-    
+
     def add_shot_powerup(self, identity, powerup):
         self.player_controller.add_shot_powerup(identity, powerup)
 
     def players_coords(self) -> dict:
         return self.player_controller.players_coords()
-    
+
     def set_player_coords(self, coords: dict) -> None:
+        if self._identity in coords and coords[self._identity]:
+            del coords[self._identity]
+
         return self.player_controller.set_player_coords(coords)
 
     def player_shoot(self, identity):
@@ -135,17 +142,13 @@ class GameController:
 
     def pick_layout(self) -> int:
         return self.layout_controller.pick_layout()
-    
+
     def render_layout(self, layout_index: int):
         self.layout_controller.render_layout(layout_index)
-    
+
     def spawn_coordinates(self) -> List[tuple]:
         return self.layout_controller.spawn_coordinates(self.player_count)
-    
+
     def update_scoreboard(self, identity):
         if identity != 0:
             self.player_controller.update_scoreboard(identity)
-
-    def set_movement(self, identity, value):
-        direction, rotation = value
-        self.player_controller.set_movement(identity, direction, rotation)

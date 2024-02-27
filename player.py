@@ -18,9 +18,6 @@ class Player(pg.sprite.Sprite):
     angle = 0
     stats_powerups = []
     weapon_powerup = None
-    last_inputs = None
-    rotation = 0
-    direction = 0
     base_path = 'assets/players/'
 
 
@@ -50,22 +47,16 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
         if self.player_controlling:
-            self.direction = int(keys[self.controls['down']] - keys[self.controls['up']])
-            self.rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
+            direction = int(keys[self.controls['down']] - keys[self.controls['up']])
+            direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
+            self.position += direction_vector
 
-            if self.last_inputs != (self.direction, self.rotation):
-                GameEventObservable().set_game_event((GameEvent.COORDS, (self.direction, self.rotation)))
-            self.last_inputs = (self.direction, self.rotation)
-
-        # update position
-        direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * self.direction * self.speed
-        self.position += direction_vector
-
-        # rotate sprite
-        rotation = self.rotation if self.direction != 1 else self.rotation * -1  # flip rotation if moving backwards
-        if rotation:
-            self.angle = self.angle % 360 + rotation * self.rotation_speed
-            self.rect = self.image.get_rect(center=self.rect.center)
+            # rotate sprite
+            rotation = int(keys[self.controls['rotate_left']] - keys[self.controls['rotate_right']])
+            rotation = rotation if direction != 1 else rotation * -1 # flip rotation if moving backwards
+            if rotation:
+                self.angle = self.angle % 360 + rotation * self.rotation_speed
+                self.rect = self.image.get_rect(center=self.rect.center)
 
         # shoot update
         self.curr_shot_cd -= 1
