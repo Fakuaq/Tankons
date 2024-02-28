@@ -5,44 +5,16 @@ from sound_controller import SoundController
 
 
 class ArrowShot(ShotPowerup):
-    """
-    Powerup that allows the player to shoot multiple shots in a wide arrow shape.
-
-    Attributes:
-        - cooldown (int): The cooldown time between shots.
-        - speed (int): The speed of the shots.
-        - shot (bool): Flag to indicate that the powerup has been used.
-
-    Methods:
-        - __init__(self, player): Initializes the ArrowShot powerup for a specific player.
-        - shoot(self): Overrides the shoot method to allow shots in a wide arrow shape.
-    """
     cooldown = 20
     speed = 3
-    # checks if the powerup has been used 
     shot = False
     
     def __init__(self, player):
-        """
-        Initializes the ArrowShot powerup for a specific player.
-
-        Parameters:
-            - player (Player): The player associated with this powerup.
-        """
         super().__init__(player, self.cooldown, self.shot)
         self.angle_positive = self.player.angle
         self.angle_negative = self.player.angle
         
     def shoot(self):
-        """
-        Overrides the shoot method to allow shooting shots in a wider angle.
-
-        Parameters:
-            None
-
-        Returns:
-            None
-        """
         if not self.shot:
             self.angle_positive = self.player.angle
             self.angle_negative = self.player.angle

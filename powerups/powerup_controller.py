@@ -5,21 +5,8 @@ from powerups.powerup import Powerup
 from powerups.arrow_shot import ArrowShot
 from powerups.rapid_shot import RapidShot
 
+
 class PowerupController:
-    """
-    A class responsible for controlling the spawning of powerups in the game.
-
-    Attributes:
-        - powerups (pygame.sprite.Group): Sprite group for powerups.
-        - players (pygame.sprite.Group): Sprite group for players.
-        - groups (tuple): Additional sprite groups to which powerups should belong.
-        - walls (pygame.sprite.Group): Sprite group for walls.
-        - powerup_options (list): defines possible powerup classes and sprites for each powerup.
-
-    Methods:
-        - spawn_powerup(self, coords):
-            Spawns a random powerup at the specified coordinates.
-    """
     powerup_options = [
         {
             'class': Speed,
@@ -38,40 +25,25 @@ class PowerupController:
             'path': 'rapid_shot.png',
         }
     ]
-    
-    def __init__(self, powerups, players, walls, *groups):
-        """
-        Initializes the PowerupController object with the specified parameters.
 
-        Parameters:
-            - powerups (pygame.sprite.Group): Sprite group for powerups.
-            - players (pygame.sprite.Group): Sprite group for players.
-            - walls (pygame.sprite.Group): Sprite group for walls.
-            - *groups: Additional sprite groups to which powerups should belong.
-        """
+    def __init__(self, powerups, players, walls, *groups):
         self.powerups = powerups
         self.players = players
         self.groups = groups
         self.walls = walls
-        
-    def spawn_powerup(self, coords):
-        """
-        Spawns a random powerup at the specified coordinates.
 
-        Parameters:
-            - coords (tuple): The (x, y) coordinates where the powerup should be spawned.
-        """
+    def spawn_powerup(self, coords):
         powerup_index = randint(0, len(self.powerup_options) - 1)
         powerup = self.powerup_options[powerup_index]
-        
-        powerup_sprite = Powerup(powerup['class'], powerup['path'], coords, self.players, self.powerups, self.walls, *self.groups)
+
+        powerup_sprite = Powerup(powerup['class'], powerup['path'], coords, self.players, self.powerups, self.walls,
+                                 *self.groups)
         return powerup_sprite, powerup['class']
-        
+
     def instantiate_powerup(self, powerup_type, coords):
         path = ''
         for powerup in self.powerup_options:
             if powerup['class'] == powerup_type:
                 path = powerup['path']
-        
+
         Powerup(powerup_type, path, coords, self.players, self.powerups, self.walls, *self.groups)
-        
