@@ -22,11 +22,13 @@ class PlayerController:
 
         for i in range(count):
             player_controlling = False
-            if i + 1 == identity:
-                player_controlling = True
-            
-            if not same_controls:
+
+            if same_controls:
+                if i + 1 == identity:
+                    player_controlling = True
+            else:
                 player_controls = controls[i]
+                player_controlling = True
 
             player = Player(i + 1, self.scores[i + 1], player_controls, coords[i], self.shots, self.walls, self.players, player_controlling, self.all_sprites)
             self.player_colors[player.identity] = player.get_sprite_color()

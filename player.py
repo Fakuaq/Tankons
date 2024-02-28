@@ -20,7 +20,6 @@ class Player(pg.sprite.Sprite):
     weapon_powerup = None
     base_path = 'assets/players/'
 
-
     def __init__(self, identity, score, controls, pos, shots, walls, players, player_controlling, *groups):
         self.score = score
         self.identity = identity
@@ -46,9 +45,9 @@ class Player(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.image_copy, self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
+        direction = int(keys[self.controls['down']] - keys[self.controls['up']])
+        direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
         if self.player_controlling:
-            direction = int(keys[self.controls['down']] - keys[self.controls['up']])
-            direction_vector = pg.math.Vector2(0, 1).rotate(-self.angle) * direction * self.speed
             self.position += direction_vector
 
             # rotate sprite

@@ -46,17 +46,26 @@ class GameController:
                                                   self.all_sprites)
         self.powerup_controller = PowerupController(self.powerups, self.players, self.walls, self.all_sprites)
 
-        if sys.argv[1] == 'client':
+        if len(sys.argv) > 1 and sys.argv[1] == 'client':
             self.client = Client(self)
             self.client.transmit(GameEvent.JOIN)
-        elif sys.argv[1] == 'server':
+        elif len(sys.argv) > 1 and sys.argv[1] == 'server':
             self.server = Server(self)
+        else:
+            layout = self.layout_controller.pick_layout()
+            self.layout_controller.render_layout(layout)
+            coords = self.layout_controller.spawn_coordinates(2)
+            self.start_game(coords)
 
     def start_game(self, coords: List[tuple]):
-        self.player_controller.spawn_players(self.player_count, coords, self._identity, True)
+        same_controls = False
+        if self.client or self.server:
+            same_controls = True
+
+        self.player_controller.spawn_players(self.player_count, coords, self._identity, same_controls)
 
     def update(self):
-        if not self.session_started: return
+        if (self.client or self.server) and not self.session_started: return
 
         if self.client:
             self.transmit_player_coords()
@@ -69,15 +78,17 @@ class GameController:
         self.game_reset_time -= 1
         self.curr_powerup_stat_cd -= 1
 
-        if self.curr_powerup_stat_cd < 0 and self.server:
+        if self.curr_powerup_stat_cd < 0:
             self.curr_powerup_stat_cd = self.powerup_stat_cd
             coords = self.layout_controller.powerup_coordinates(self.powerups)
 
+            powerup_class = powerup = None
             if coords:
                 powerup, powerup_class = self.powerup_controller.spawn_powerup(coords)
+            if coords and self.server:
                 self.server.broadcast(GameEvent.POWERUP, (powerup_class.__name__, powerup.rect.center))
 
-        if not self.game_resetting and self.server:
+        if not self.game_resetting and not self.client:
             self.check_winner()
 
         if self.game_resetting and self.game_reset_time < 0:
@@ -107,6 +118,11 @@ class GameController:
 
         if self.server:
             GameEventObservable().set_game_event((GameEvent.START_ROUND, None))
+        if not self.server and not self.client:
+            layout = self.layout_controller.pick_layout()
+            self.layout_controller.render_layout(layout)
+            coords = self.layout_controller.spawn_coordinates(2)
+            self.start_game(coords)
 
     def spawn_powerup(self, powerup_class_name, coords):
         _class = globals()[powerup_class_name]
