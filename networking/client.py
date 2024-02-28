@@ -57,7 +57,7 @@ class Client(Observer):
 
     def update(self, observable: GameEventObservable):
         event_type: GameEvent
-        (event_type, event_value) = observable.game_event()
+        (event_type, _) = observable.game_event()
 
         match event_type.value:
             case GameEvent.SHOT.value:

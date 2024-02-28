@@ -8,12 +8,12 @@ from enums.game_event import GameEvent
 from networking.server import Server
 from networking.client import Client
 from typing import List
-from powerups.speed import Speed
-from powerups.firerate import FireRate
-from powerups.rapid_shot import RapidShot
-from powerups.arrow_shot import ArrowShot
 from observers.game_event_observable import GameEventObservable
 import sys
+from powerups.speed import Speed  # pylint: disable=unused-import
+from powerups.firerate import FireRate  # pylint: disable=unused-import
+from powerups.rapid_shot import RapidShot  # pylint: disable=unused-import
+from powerups.arrow_shot import ArrowShot  # pylint: disable=unused-import
 
 
 class GameController:
