@@ -1,5 +1,7 @@
 # Tankons
 
+Tankons is a 2d top-down shooter made with pygame
+
 ## Setup
 
 Dependencies are defined in [requirements.txt](requirements.txt)
