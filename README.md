@@ -19,11 +19,21 @@ To run game locally (max 2 players) `python main.py`
 
 ## Running multiplayer
 
-When running both client and server scripts update IP address with the server's IP
-
-To run server `python main.py server` \
-To run client `python main.py client`
+Adjust the IP addresses and ports if necessary in [client.py](networking/client.py), [server.py](networking/server.py)
 
 Controls for each client are the same as 1. player controls defined above
+
+Server runs it's own game instance and only support 1 game instance at a time for now
+
+### Server
+
+Running up to four players: `python main.py server <client_count>`
+
+Default is two players: `python main.py server` 
+
+### Client
+`python main.py client`
+
+
 
 

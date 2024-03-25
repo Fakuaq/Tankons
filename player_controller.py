@@ -46,22 +46,18 @@ class PlayerController:
         if self.player_images:
             score_x_offset = 50
             tank_y_offset = 7
-            scoreboard_x_offset = 100
             margins = 100
             y_axis = 50
-            x_axis = self.screen.get_width() / 2 - scoreboard_x_offset
+            x_axis = self.screen.get_width() / 2 + score_x_offset - (self.player_images[0].get_width() + margins) * (len(self.scores) / 2)
             score_color = (0, 0, 0)
             
-            # Draw each scoreboard element
             for i, (player_identity, score) in enumerate(self.scores.items()):
                 tank_image = self.player_images[player_identity - 1]
 
                 x_position = x_axis + (tank_image.get_width() + margins) * i
                 y_position = y_axis - tank_image.get_height() / 2 - tank_y_offset
-                # Draw tank image
                 self.screen.blit(tank_image, (x_position, y_position))
 
-                # Draw score number next to the tank image
                 score_text = self.font.render(str(score), 1, score_color)
                 score_x = x_position + score_x_offset
                 score_y = y_axis - score_text.get_height() / 2
@@ -112,6 +108,9 @@ class PlayerController:
     def update_scoreboard(self, identity):
         if identity != 0:
             self.scores[identity] += 1
+
+    def set_scores(self, scores):
+        self.scores = scores
 
     def _player_from_identity(self, identity):
         for player in self.players:

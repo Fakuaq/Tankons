@@ -1,5 +1,5 @@
 from config import layouts
-from random import randint, shuffle
+from random import randint, shuffle, choice
 from wall import Wall
 import pygame as pg
 
@@ -14,8 +14,16 @@ class LayoutController:
         self.screen = screen
         self.groups = groups
 
-    def pick_layout(self) -> int:
-        return randint(0, len(layouts) - 1)
+    def pick_layout(self, player_count) -> int:
+        allowed_layout_indexes = []
+        for i, layout in enumerate(layouts):
+            if len(layout['spawn_zones']) > player_count:
+                allowed_layout_indexes.append(i)
+        
+        if not allowed_layout_indexes:
+            raise RuntimeError('No layouts exist for the given player count')
+        
+        return choice(allowed_layout_indexes)
 
     def render_layout(self, layout_index: int) -> None:
         self.spawns = []

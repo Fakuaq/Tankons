@@ -37,8 +37,10 @@ class Client(Observer):
     def handle_response(self, message_type: str, value):
         match message_type:
             case GameEvent.JOIN.value:
-                self._gc.set_identity(value)
-                self._identity = value
+                (identity, player_count) = value
+                self._gc.set_identity(identity)
+                self._identity = identity
+                self._gc.set_player_count(player_count)
             case GameEvent.START_ROUND.value:
                 self._gc.reset_game()
                 self._gc.session_started = True

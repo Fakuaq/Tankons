@@ -52,7 +52,7 @@ class GameController:
         elif len(sys.argv) > 1 and sys.argv[1] == 'server':
             self.server = Server(self)
         else:
-            layout = self.layout_controller.pick_layout()
+            layout = self.layout_controller.pick_layout(self.player_count)
             self.layout_controller.render_layout(layout)
             coords = self.layout_controller.spawn_coordinates(2)
             self.start_game(coords)
@@ -83,7 +83,7 @@ class GameController:
             coords = self.layout_controller.powerup_coordinates(self.powerups)
 
             powerup_class = powerup = None
-            if coords:
+            if coords and not self.client:
                 powerup, powerup_class = self.powerup_controller.spawn_powerup(coords)
             if coords and self.server:
                 self.server.broadcast(GameEvent.POWERUP, (powerup_class.__name__, powerup.rect.center))
@@ -119,7 +119,7 @@ class GameController:
         if self.server:
             GameEventObservable().set_game_event((GameEvent.START_ROUND, None))
         if not self.server and not self.client:
-            layout = self.layout_controller.pick_layout()
+            layout = self.layout_controller.pick_layout(self.player_count)
             self.layout_controller.render_layout(layout)
             coords = self.layout_controller.spawn_coordinates(2)
             self.start_game(coords)
@@ -157,7 +157,7 @@ class GameController:
         self._identity = value
 
     def pick_layout(self) -> int:
-        return self.layout_controller.pick_layout()
+        return self.layout_controller.pick_layout(self.player_count)
 
     def render_layout(self, layout_index: int):
         self.layout_controller.render_layout(layout_index)
@@ -168,3 +168,11 @@ class GameController:
     def update_scoreboard(self, identity):
         if identity != 0:
             self.player_controller.update_scoreboard(identity)
+
+    def set_player_count(self, count):
+        self.player_count = count
+        self.scores = {}
+        for i in range(self.player_count):
+            self.scores[i + 1] = 0
+            
+        self.player_controller.set_scores(self.scores)
