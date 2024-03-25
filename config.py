@@ -1,11 +1,9 @@
 import pygame as pg
 
-# Configuration settings
 config = {
-    'debug': 0 # Set to 1 for debug mode, 0 for regular mode
+    'debug': 0
 }
 
-# Player controls for each player
 controls = [
     {
         'up': pg.K_w,
@@ -23,7 +21,6 @@ controls = [
     },
 ]
 
-# Layout configurations for different game levels
 layouts = [
     {
         'wall_sizes': [(1000, 10), (1000, 10), (10, 510), (10, 510), (800, 10), (800, 10)],
